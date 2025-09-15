@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
@@ -14,6 +14,13 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -24,22 +31,22 @@ export default function AuthPage() {
 
     try {
       const endpoint = isLogin ? "login" : "signup";
+    
       const res = await axios.post(
         `http://localhost:5000/api/auth/${endpoint}`,
         form
       );
 
-      // Save token to localStorage
       localStorage.setItem("token", res.data.token);
-
-      // Redirect to dashboard
       navigate("/dashboard");
+
     } catch (err) {
       alert(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">

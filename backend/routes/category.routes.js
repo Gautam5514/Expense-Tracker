@@ -3,11 +3,11 @@ const {
   getCategories,
   addCategory,
   deleteCategory,
-} = require("../controllers/category.controller"); // Corrected path
-const { protect } = require("../controllers/auth.controller"); // Corrected path
+} = require("../controllers/category.controller");
+const { protect } = require("../controllers/auth.controller"); 
 const router = express.Router();
 
-router.use(protect); // This now works correctly
+router.use(protect); 
 
 router.route("/").get(getCategories).post(addCategory);
 router.route("/:id").delete(deleteCategory);
