@@ -1,13 +1,18 @@
+// routes/budget.routes.js
+
 const express = require("express");
 const router = express.Router();
-const { getBudgets, createBudget } = require("../controllers/budget.controller");
+const { getBudgets, createBudget, updateBudget, deleteBudget } = require("../controllers/budget.controller");
 const { protect } = require("../controllers/auth.controller");
 
-// Protect all routes in this file
 router.use(protect);
 
 router.route("/")
     .get(getBudgets)
     .post(createBudget);
+    
+router.route("/:id")
+    .put(updateBudget)
+    .delete(deleteBudget);
 
 module.exports = router;

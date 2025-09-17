@@ -8,6 +8,9 @@ import {
   Menu,
   X,
   List,
+  ChevronRight,
+  ChevronsRight,
+  ChevronsLeft
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
@@ -34,21 +37,21 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static z-40 top-0 left-0 h-screen bg-gradient-to-b from-purple-600 to-purple-800 text-white
+        className={`sticky z-40 top-0 left-0 h-screen bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-400 text-white
         transition-all duration-300 flex flex-col
-        ${isOpen ? "w-64" : "w-20"}`}
+        ${isOpen ? "min-w-54" : "w-16"}`}
       >
         {/* Logo + collapse toggle */}
         <div className="flex items-center justify-between p-4 border-b border-purple-500">
           <div className="flex items-center space-x-2">
             <span className="text-white text-2xl">⬤</span>
-            {isOpen && <span className="text-xl font-bold">SpendWise</span>}
+            {isOpen && <span className="text-xl font-bold">TrackMoney</span>}
           </div>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="hidden lg:block text-gray-200 hover:text-white"
+            className="hidden lg:block text-gray-200 hover:text-white cursor-pointer"
           >
-            {isOpen ? <X size={18} /> : <Menu size={18} />}
+            {isOpen ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} /> }
           </button>
         </div>
 
@@ -82,7 +85,7 @@ export default function Sidebar() {
 
         {/* Footer (optional) */}
         <div className="p-4 border-t border-purple-500 text-sm text-gray-200">
-          {isOpen && "© 2025 SpendWise"}
+          {isOpen && "© 2025 TrackMoney"}
         </div>
       </aside>
     </>

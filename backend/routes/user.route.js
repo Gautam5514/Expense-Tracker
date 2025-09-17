@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const { protect } = require("../controllers/auth.controller");
-const { getMe, updateMe } = require("../controllers/user.controller");
+const { getMe, updateMe, updateFinancialProfile } = require("../controllers/user.controller");
 
 const router = express.Router();
 
@@ -25,5 +25,7 @@ router.use(protect);
 router.get("/me", getMe);
 // For the update route, use multer middleware to handle a single file from a field named 'profilePicture'
 router.put("/updateMe", upload.single('profilePicture'), updateMe);
+
+router.put("/financial-profile", updateFinancialProfile);
 
 module.exports = router;

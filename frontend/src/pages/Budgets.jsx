@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useState, useEffect, useRef } from "react";
+import { MoreVertical, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import AddExpenseModal from "../components/AddExpenseModal";
 import AddBudgetModal from "../components/AddBudgetModal";
 
-// A simple color array to cycle through for the progress bars
 const COLORS = ["bg-indigo-500", "bg-purple-500", "bg-pink-500", "bg-cyan-500", "bg-emerald-500"];
 
-// Loading state component for a better UX
 const LoadingSkeleton = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {Array.from({ length: 3 }).map((_, i) => (
@@ -22,27 +21,30 @@ const LoadingSkeleton = () => (
   </div>
 );
 
-
 export default function Budgets() {
   const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+  const [budgetToEdit, setBudgetToEdit] = useState(null);
+  const [activeMenu, setActiveMenu] = useState(null);
+  const menuRef = useRef(null);
 
-  // Function to fetch the dynamically calculated budget data from the backend
   const fetchData = async () => {
     try {
-      // Don't set loading to true on refetch, only on initial load
-      // setLoading(true); 
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/budgets", {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+
+      const res = await axios.get(`http://localhost:5000/api/budgets?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBudgets(res.data.data.budgets);
     } catch (err) {
-      setError("Could not fetch budget data. Please try again later.");
-      console.error(err);
+      setError("Could not fetch budget data.");
     } finally {
       setLoading(false);
     }
@@ -50,29 +52,82 @@ export default function Budgets() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [currentDate]);
 
-  // A single handler to close any modal and refresh the data
+  const handleOpenAddModal = () => {
+    setBudgetToEdit(null);
+    setIsBudgetModalOpen(true);
+  };
+
+  const handleOpenEditModal = (budget) => {
+    setBudgetToEdit(budget);
+    setIsBudgetModalOpen(true);
+    setActiveMenu(null);
+  };
+
   const handleCloseModal = () => {
     setIsExpenseModalOpen(false);
     setIsBudgetModalOpen(false);
-    fetchData(); // This is the key to automatic updates
+    setBudgetToEdit(null);
+    fetchData();
   };
+
+  const handleDelete = async (budget) => {
+    setActiveMenu(null);
+    if (window.confirm(`Are you sure you want to delete the budget for "${budget.category}"?`)) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`http://localhost:5000/api/budgets/${budget._id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        fetchData();
+      } catch (err) {
+        alert("Failed to delete budget.");
+      }
+    }
+  };
+
+  const handlePreviousMonth = () => setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  const handleNextMonth = () => setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  const handleToggleMenu = (budgetId) => setActiveMenu(activeMenu === budgetId ? null : budgetId);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) setActiveMenu(null);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const availableCategories = budgets.map(b => b.category);
 
-
   return (
     <main className="flex-1 p-8">
-      {/* Header */}
-      <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Budgets Overview</h1>
-          <p className="text-gray-500">
-            Track your spending against your set budgets for this month.
-          </p>
+      <div className="flex items-center justify-between mb-6">
+        {/* Left Section: Title + Month Nav */}
+        <div className="flex items-center gap-6">
+          <h1 className="text-2xl font-bold whitespace-nowrap">Budgets Overview</h1>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePreviousMonth}
+              className="p-1 rounded-md hover:bg-gray-100"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <span className="font-semibold text-gray-600 text-lg w-36 text-center">
+              {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
+            </span>
+            <button
+              onClick={handleNextMonth}
+              className="p-1 rounded-md hover:bg-gray-100"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
         </div>
-        <div className="flex space-x-3">
+
+        {/* Right Section: Buttons */}
+        <div className="flex items-center space-x-2">
           <button
             onClick={() => setIsExpenseModalOpen(true)}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow"
@@ -80,7 +135,7 @@ export default function Budgets() {
             + Add Expense
           </button>
           <button
-            onClick={() => setIsBudgetModalOpen(true)}
+            onClick={handleOpenAddModal}
             className="px-4 py-2 border rounded-lg hover:bg-gray-50"
           >
             + New Budget
@@ -88,7 +143,7 @@ export default function Budgets() {
         </div>
       </div>
 
-      {/* Conditional Rendering for Loading, Error, and Data states */}
+
       {loading ? (
         <LoadingSkeleton />
       ) : error ? (
@@ -96,7 +151,6 @@ export default function Budgets() {
           <p>{error}</p>
         </div>
       ) : (
-        // Budget Cards Grid
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {budgets.length > 0 ? (
             budgets.map((b, i) => {
@@ -105,18 +159,36 @@ export default function Budgets() {
               const overspent = b.spent > b.limit;
 
               return (
+                // CORRECTED: Changed < to <div
                 <div
                   key={b._id}
                   className={`p-5 rounded-lg border ${overspent ? "border-red-300 bg-red-50" : "bg-white shadow"}`}
                 >
-                  <div className="flex justify-between items-center mb-2">
-                    <h2 className="font-semibold text-gray-800">{b.category}</h2>
-                    <span className={`text-sm font-medium ${overspent ? "text-red-600" : "text-gray-500"}`}>
-                      {percent}%
-                    </span>
+                  {/* CORRECTED: Menu is now inside the header for proper layout */}
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h2 className="font-semibold text-gray-800">{b.category}</h2>
+                      <span className={`text-sm font-medium ${overspent ? "text-red-600" : "text-gray-500"}`}>
+                        {percent}% Used
+                      </span>
+                    </div>
+                    <div className="relative" ref={activeMenu === b._id ? menuRef : null}>
+                      <button onClick={() => handleToggleMenu(b._id)} className="text-gray-400 hover:text-gray-600 p-1 -mr-1">
+                        <MoreVertical size={18} />
+                      </button>
+                      {activeMenu === b._id && (
+                        <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-20 border">
+                          <a onClick={() => handleOpenEditModal(b)} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                            <Edit size={14} className="mr-2" /> Edit
+                          </a>
+                          <a onClick={() => handleDelete(b)} className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer">
+                            <Trash2 size={14} className="mr-2" /> Delete
+                          </a>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Progress bar */}
                   <div className="w-full bg-gray-200 h-2 rounded-full mb-2">
                     <div
                       className={`h-2 rounded-full ${overspent ? 'bg-red-500' : COLORS[i % COLORS.length]}`}
@@ -135,7 +207,6 @@ export default function Budgets() {
                     </span>
                   </div>
 
-                  {/* Dynamic Warning Messages */}
                   {percent > 85 && !overspent && (
                     <p className="text-xs mt-1 text-yellow-600">
                       ! Nearing budget limit.
@@ -151,16 +222,20 @@ export default function Budgets() {
             })
           ) : (
             <div className="md:col-span-2 lg:col-span-3 text-center py-12 bg-white rounded-lg shadow">
-              <h3 className="text-lg font-medium text-gray-800">No budgets found.</h3>
-              <p className="text-gray-500 mt-1">Click the "+ New Budget" button to get started.</p>
+              <h3 className="text-lg font-medium text-gray-800">No budgets found for this month.</h3>
+              <p className="text-gray-500 mt-1">Click the "+ New Budget" button to create one.</p>
             </div>
           )}
         </div>
       )}
 
-      {/* Render Modals (they are invisible until their 'isOpen' prop is true) */}
-      <AddExpenseModal isOpen={isExpenseModalOpen} onClose={handleCloseModal}  availableCategories={availableCategories} />
-      <AddBudgetModal isOpen={isBudgetModalOpen} onClose={handleCloseModal} />
+      <AddExpenseModal isOpen={isExpenseModalOpen} onClose={handleCloseModal} availableCategories={availableCategories} />
+      {/* CORRECTED: Added the missing budgetToEdit prop */}
+      <AddBudgetModal
+        isOpen={isBudgetModalOpen}
+        onClose={handleCloseModal}
+        budgetToEdit={budgetToEdit}
+      />
     </main>
   );
 }

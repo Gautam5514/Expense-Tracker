@@ -1,16 +1,50 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { Briefcase, GraduationCap, DollarSign, Building, Calendar, School } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000";
 
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center h-64">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+  </div>
+);
+
+// A reusable input component for consistency
+const InputField = ({ label, name, value, onChange, ...props }) => (
+  <div>
+    <label htmlFor={name} className="block text-sm font-medium text-gray-700">{label}</label>
+    <input
+      id={name}
+      name={name}
+      value={value || ''}
+      onChange={onChange}
+      className="mt-1 w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+      {...props}
+    />
+  </div>
+);
+
+
 export default function Settings() {
   const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({ name: '' });
-  const [profileImageFile, setProfileImageFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // --- State for the Personal Info Form ---
+  const [personalFormData, setPersonalFormData] = useState({ name: '' });
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
   
+  // --- NEW: State for the Financial Profile Form ---
+  const [financialFormData, setFinancialFormData] = useState({
+    userType: 'unspecified',
+    companyName: '',
+    salaryDate: '',
+    collegeName: '',
+    monthlyIncome: '',
+  });
+
   const fileInputRef = useRef(null);
 
   // Fetch user data on component mount
@@ -21,8 +55,14 @@ export default function Settings() {
         const res = await axios.get(`${API_BASE_URL}/api/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUser(res.data.data.user);
-        setFormData({ name: res.data.data.user.name });
+        const fetchedUser = res.data.data.user;
+        setUser(fetchedUser);
+
+        // Populate both form states
+        setPersonalFormData({ name: fetchedUser.name || '' });
+        if (fetchedUser.financialProfile) {
+          setFinancialFormData(fetchedUser.financialProfile);
+        }
       } catch (err) {
         setError("Failed to load user data.");
       } finally {
@@ -32,118 +72,124 @@ export default function Settings() {
     fetchUserData();
   }, []);
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
+  // --- Handlers for form inputs ---
+  const handlePersonalChange = (e) => setPersonalFormData({ ...personalFormData, [e.target.name]: e.target.value });
+  const handleFinancialChange = (e) => setFinancialFormData({ ...financialFormData, [e.target.name]: e.target.value });
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setProfileImageFile(file);
-      // Create a URL for previewing the image instantly
       setPreviewImage(URL.createObjectURL(file));
     }
   };
 
+  // --- Handler for SAVING ALL changes ---
   const handleSaveChanges = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const apiData = new FormData();
-    apiData.append('name', formData.name);
-    if (profileImageFile) {
-      apiData.append('profilePicture', profileImageFile);
-    }
-
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.put(`${API_BASE_URL}/api/users/updateMe`, apiData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
+      
+      // --- Promise 1: Update Personal Info & Photo ---
+      const personalData = new FormData();
+      personalData.append('name', personalFormData.name);
+      if (profileImageFile) {
+        personalData.append('profilePicture', profileImageFile);
+      }
+      const personalPromise = axios.put(`${API_BASE_URL}/api/users/updateMe`, personalData, {
+        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
       });
-      setUser(res.data.data.user);
-      alert("Profile updated successfully!");
+
+      // --- Promise 2: Update Financial Profile ---
+      const financialPromise = axios.put(`${API_BASE_URL}/api/users/financial-profile`, financialFormData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      // Wait for both updates to complete
+      await Promise.all([personalPromise, financialPromise]);
+      
+      alert("Settings updated successfully!");
     } catch (err) {
-      setError("Failed to update profile.");
+      setError("Failed to update settings. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) return <div>Loading settings...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <div className="text-red-500 text-center p-6">{error}</div>;
 
-  // Construct the full URL for the user's profile picture
-  const profileImageUrl = user.profilePicture
-    ? `${API_BASE_URL}/${user.profilePicture.replace(/\\/g, '/')}`
-    : 'path/to/default/avatar.png';
+  const profileImageUrl = user.profilePicture ? `${API_BASE_URL}/${user.profilePicture.replace(/\\/g, '/')}` : `https://ui-avatars.com/api/?name=${user.name}&background=random`;
 
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">Settings</h1>
 
-      <form onSubmit={handleSaveChanges}>
-        {/* Personal Info */}
-        <div className="bg-white shadow rounded-lg p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Personal Information</h2>
-          <p className="text-gray-500 text-sm">Update your personal details here.</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="name" className="text-sm text-gray-600">Name</label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full mt-1 border rounded-md px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-600">Email Address</label>
-              <input
-                type="email"
-                value={user.email}
-                className="w-full mt-1 border rounded-md px-3 py-2 text-sm bg-gray-100 cursor-not-allowed"
-                disabled
-              />
-            </div>
-          </div>
-
-          {/* Profile picture */}
-          <div className="flex items-center space-x-4 mt-4">
-            <img
-              src={previewImage || profileImageUrl}
-              alt="Profile"
-              className="w-14 h-14 rounded-full border object-cover"
-            />
-            {/* Hidden file input */}
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleImageChange}
-              className="hidden"
-            />
-            {/* Button to trigger file input */}
-            <button
-              type="button"
-              onClick={() => fileInputRef.current.click()}
-              className="px-3 py-2 border rounded-md text-sm hover:bg-gray-50"
-            >
-              Change
-            </button>
+      <form onSubmit={handleSaveChanges} className="space-y-8">
+        {/* --- Personal Information Section --- */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-lg font-semibold border-b pb-4">Personal Information</h2>
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+             <div className="md:col-span-2 space-y-6">
+                 <InputField label="Name" name="name" type="text" value={personalFormData.name} onChange={handlePersonalChange} />
+                 <InputField label="Email Address" name="email" type="email" value={user.email} disabled className="bg-gray-100 cursor-not-allowed"/>
+             </div>
+             <div className="flex flex-col items-center">
+                 <label className="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+                 <img src={previewImage || profileImageUrl} alt="Profile" className="w-24 h-24 rounded-full border object-cover" />
+                 <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
+                 <button type="button" onClick={() => fileInputRef.current.click()} className="mt-4 px-3 py-2 border rounded-md text-sm hover:bg-gray-50">Change Picture</button>
+             </div>
           </div>
         </div>
 
-        {/* Save Changes Button */}
-        <div className="flex justify-end space-x-3 mt-8">
-          <button type="button" className="px-4 py-2 border rounded-md text-sm hover:bg-gray-50">Cancel</button>
-          <button type="submit" disabled={loading} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50">
-            {loading ? 'Saving...' : 'Save Changes'}
+        {/* --- NEW: Financial Profile Section --- */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-lg font-semibold border-b pb-4">Financial Profile</h2>
+          <p className="text-sm text-gray-500 mt-4">This information helps personalize your experience and track income. It is optional and private.</p>
+
+          <div className="mt-6 space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Are you a...?</label>
+              <div className="mt-2 grid grid-cols-2 gap-4">
+                <button type="button" onClick={() => handleFinancialChange({ target: { name: 'userType', value: 'professional' }})} className={`flex items-center justify-center p-4 border rounded-lg ${financialFormData.userType === 'professional' ? 'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-200' : 'hover:bg-gray-50'}`}>
+                  <Briefcase className="mr-3" size={20} /> Professional
+                </button>
+                <button type="button" onClick={() => handleFinancialChange({ target: { name: 'userType', value: 'student' }})} className={`flex items-center justify-center p-4 border rounded-lg ${financialFormData.userType === 'student' ? 'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-200' : 'hover:bg-gray-50'}`}>
+                  <GraduationCap className="mr-3" size={20} /> Student
+                </button>
+              </div>
+            </div>
+
+            {/* Conditional Fields for Professional */}
+            {financialFormData.userType === 'professional' && (
+              <div className="p-4 bg-slate-50 rounded-lg space-y-4 animate-fade-in">
+                  <InputField label="Company Name" name="companyName" value={financialFormData.companyName} onChange={handleFinancialChange} placeholder="e.g., Google" />
+                  <InputField label="Salary Date (Day of Month)" name="salaryDate" type="number" min="1" max="31" value={financialFormData.salaryDate} onChange={handleFinancialChange} placeholder="e.g., 28" />
+              </div>
+            )}
+            
+            {/* Conditional Fields for Student */}
+            {financialFormData.userType === 'student' && (
+               <div className="p-4 bg-slate-50 rounded-lg animate-fade-in">
+                  <InputField label="College/University Name" name="collegeName" value={financialFormData.collegeName} onChange={handleFinancialChange} placeholder="e.g., University of Example" />
+              </div>
+            )}
+
+            {/* Common Income Field */}
+            {financialFormData.userType !== 'unspecified' && (
+              <div className="pt-4 border-t">
+                  <InputField label="Monthly Income / Pocket Money" name="monthlyIncome" type="number" min="0" value={financialFormData.monthlyIncome} onChange={handleFinancialChange} placeholder="Enter your total monthly income" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* --- Save Changes Button --- */}
+        <div className="flex justify-end pt-4">
+          <button type="submit" disabled={loading} className="px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50">
+            {loading ? 'Saving...' : 'Save All Changes'}
           </button>
         </div>
       </form>

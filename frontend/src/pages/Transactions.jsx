@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
-import { Search, Filter, Download, MoreHorizontal, Edit, Trash2, Eye } from "lucide-react";
-
-// Import your modal components (adjust paths as necessary)
+import { Search, Filter, Download, MoreHorizontal, Edit, Trash2, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import Swal from 'sweetalert2';
+import 'sweetalert2/src/sweetalert2.scss';
+import { toast } from 'react-toastify';
 import AddExpenseModal from "../components/AddExpenseModal";
 import TransactionViewModal from "../components/TransactionViewModal";
 
@@ -19,9 +20,15 @@ const categoryColors = {
   Utilities: "bg-cyan-100 text-cyan-600",
   default: "bg-gray-100 text-gray-600",
 };
+// --- Helper Components for Loading/Error States ---
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center h-64">
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+  </div>
+);
 
 export default function Transactions() {
-  // Data and API State
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,14 +46,19 @@ export default function Transactions() {
 
   const menuRef = useRef(null);
 
-  // --- Data Fetching ---
   const fetchData = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/transactions", {
+
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1; // getMonth() is 0-indexed
+
+      // Append year and month to the request URL
+      const res = await axios.get(`http://localhost:5000/api/transactions?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setTransactions(res.data.data.transactions);
       setError(null);
     } catch (err) {
@@ -57,9 +69,10 @@ export default function Transactions() {
     }
   };
 
+  // --- MODIFIED: useEffect now re-fetches data when currentDate changes ---
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [currentDate]); // Dependency array includes currentDate
 
   // --- Memos for Performance ---
   const filteredTransactions = useMemo(() => {
@@ -94,6 +107,24 @@ export default function Transactions() {
     setActiveMenu(activeMenu === transactionId ? null : transactionId);
   };
 
+   const handlePreviousMonth = () => {
+    setCurrentDate(prevDate => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(newDate.getMonth() - 1);
+      return newDate;
+    });
+    setCurrentPage(1); // Reset to first page
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(prevDate => {
+      const newDate = new Date(prevDate);
+      newDate.setMonth(newDate.getMonth() + 1);
+      return newDate;
+    });
+    setCurrentPage(1); // Reset to first page
+  };
+
   // --- Modal Management ---
   const handleOpenViewModal = (transaction) => {
     setActiveTransaction(transaction);
@@ -121,21 +152,38 @@ export default function Transactions() {
 
   // --- CRUD and Other Actions ---
   const handleDelete = async (idsToDelete) => {
-    const confirmMessage = `Are you sure you want to delete ${idsToDelete.length} transaction(s)?`;
-    if (!window.confirm(confirmMessage)) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const deletePromises = idsToDelete.map(id =>
-        axios.delete(`http://localhost:5000/api/transactions/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-      );
-      await Promise.all(deletePromises);
-      setSelectedRows(prev => prev.filter(id => !idsToDelete.includes(id)));
-      fetchData(); // Refresh list
-    } catch (err) { 
-      alert("An error occurred while deleting transactions.");
-    }
-    setActiveMenu(null); // Close dropdown
+    // 1. Show the confirmation modal
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `You are about to delete ${idsToDelete.length} transaction(s). This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#4F46E5', // Indigo
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      // 2. Check if the user confirmed
+      if (result.isConfirmed) {
+        try {
+          // 3. If confirmed, proceed with the deletion logic
+          const token = localStorage.getItem("token");
+          const deletePromises = idsToDelete.map(id =>
+            axios.delete(`http://localhost:5000/api/transactions/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+          );
+          await Promise.all(deletePromises);
+          
+          // Show a success toast after deletion
+          toast.success('Transaction(s) deleted successfully!');
+          
+          setSelectedRows(prev => prev.filter(id => !idsToDelete.includes(id)));
+          fetchData(); // Refresh list
+        } catch (err) { 
+          // Show an error toast if deletion fails
+          toast.error("An error occurred while deleting transactions.");
+        }
+        setActiveMenu(null); // Close dropdown
+      }
+    });
   };
 
   const handleExportCSV = () => {
@@ -171,7 +219,7 @@ export default function Transactions() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (loading) return <div className="text-center p-8">Loading transactions...</div>;
+  if (loading) return <LoadingSpinner />;
   if (error) return <div className="text-center p-8 text-red-500">{error}</div>;
 
   return (
@@ -179,9 +227,22 @@ export default function Transactions() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Transactions</h1>
-        <button onClick={handleOpenNewModal} className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700">
-          + New Transaction
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+              <button onClick={handlePreviousMonth} className="p-2 rounded-md hover:bg-gray-100">
+                  <ChevronLeft size={20} />
+              </button>
+              <span className="font-semibold text-lg w-36 text-center">
+                  {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+              </span>
+              <button onClick={handleNextMonth} className="p-2 rounded-md hover:bg-gray-100">
+                  <ChevronRight size={20} />
+              </button>
+          </div>
+          <button onClick={handleOpenNewModal} className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700">
+            + New Transaction
+          </button>
+        </div>
       </div>
 
       {/* Toolbar */}
@@ -264,8 +325,28 @@ export default function Transactions() {
       </div>
       
       {/* Modals */}
-      <AddExpenseModal isOpen={isEditModalOpen} onClose={handleCloseModals} transactionToEdit={activeTransaction} />
-      <TransactionViewModal isOpen={isViewModalOpen} onClose={handleCloseModals} transaction={activeTransaction} />
+   <AddExpenseModal 
+        isOpen={isEditModalOpen} 
+        onClose={handleCloseModals} 
+        transactionToEdit={activeTransaction} 
+        availableCategories={paginatedTransactions.map(t => t.category).filter((v, i, a) => a.indexOf(v) === i)} // Pass unique categories
+      />
+        <TransactionViewModal 
+        isOpen={isViewModalOpen} 
+        onClose={handleCloseModals} 
+        transaction={activeTransaction}
+        // Pass handler functions for the Edit and Delete buttons inside the modal
+        onEdit={() => {
+            // Close the view modal and immediately open the edit modal
+            setIsViewModalOpen(false);
+            handleOpenEditModal(activeTransaction);
+        }}
+        onDelete={() => {
+            // Close the view modal and trigger the delete confirmation
+            setIsViewModalOpen(false);
+            handleDelete([activeTransaction._id]);
+        }}
+      />
     </div>
   );
 }

@@ -54,7 +54,7 @@ export default function Navbar() {
 
   return (
     <header className="flex justify-between items-center px-6 py-4 bg-white shadow-sm relative">
-      <h1 className="text-lg font-semibold">SpendWise</h1>
+      <h1 className="text-lg font-semibold">TrackMoney</h1>
 
       <div className="flex items-center space-x-6">
         <button className="text-gray-600 hover:text-gray-800"><MessageSquare size={22} /></button>
@@ -86,11 +86,8 @@ export default function Navbar() {
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
               )}
-              <Link to="/profile" onClick={() => setOpen(false)} className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                My Profile
-              </Link>
               <Link to="/settings" onClick={() => setOpen(false)} className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
-                Settings
+                My Profile
               </Link>
               <button
                 onClick={handleLogout}

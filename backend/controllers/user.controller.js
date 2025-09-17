@@ -31,3 +31,44 @@ exports.updateMe = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+// --- NEW: Controller function to update ONLY the Financial Profile ---
+exports.updateFinancialProfile = async (req, res) => {
+    try {
+        const {
+            userType,
+            companyName,
+            salaryDate,
+            collegeName,
+            monthlyIncome
+        } = req.body;
+
+        // Construct the update object from the request body
+        // This ensures we only update fields that are provided
+        const profileUpdates = {
+            'financialProfile.userType': userType,
+            'financialProfile.companyName': companyName,
+            'financialProfile.salaryDate': salaryDate,
+            'financialProfile.collegeName': collegeName,
+            'financialProfile.monthlyIncome': monthlyIncome,
+        };
+        
+        // Remove any undefined properties so we don't overwrite existing data with nulls
+        Object.keys(profileUpdates).forEach(key => profileUpdates[key] === undefined && delete profileUpdates[key]);
+
+        // Find the user and update their financialProfile
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            { $set: profileUpdates },
+            { new: true, runValidators: true } // Return the updated document
+        );
+
+        res.status(200).json({
+            status: 'success',
+            data: { user: updatedUser }
+        });
+        
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};

@@ -4,12 +4,40 @@ const Budget = require("../models/budget.model");
 
 
 exports.getTransactions = async (req, res) => {
-  try {
-    const transactions = await Transaction.find({ user: req.user.id }).sort({ date: -1 });
-    res.status(200).json({ results: transactions.length, data: { transactions } });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+    try {
+        const userId = req.user.id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Build base query
+        const query = { user: userId };
+
+        // --- NEW: Add optional date filtering ---
+        if (req.query.year && req.query.month) {
+            const year = parseInt(req.query.year);
+            const month = parseInt(req.query.month);
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0, 23, 59, 59);
+            query.date = { $gte: startDate, $lte: endDate };
+        }
+        // --- END NEW ---
+        
+        const transactions = await Transaction.find(query)
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalResults = await Transaction.countDocuments(query);
+            
+        res.status(200).json({ 
+            results: transactions.length,
+            total: totalResults,
+            data: { transactions }
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
 
 
