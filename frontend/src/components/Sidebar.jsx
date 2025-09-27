@@ -30,28 +30,43 @@ export default function Sidebar() {
       {/* Mobile toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-purple-600 text-white rounded-md shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-50 p-3
+             rounded-full shadow-xl
+             bg-white/50 border border-white/60
+             backdrop-blur-md backdrop-saturate-150
+             text-white transition-all duration-300
+             hover:bg-white/30 hover:scale-105 active:scale-95"
       >
-        {isOpen ? <X size={20} /> : <Menu size={20} />}
+        {isOpen ? <X size={16} /> : <Menu size={16} />}
       </button>
+
+
 
       {/* Sidebar */}
       <aside
-        className={`sticky z-40 top-0 left-0 h-screen bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-400 text-white
-        transition-all duration-300 flex flex-col
-        ${isOpen ? "min-w-54" : "w-16"}`}
+        className={`
+    z-40 top-0 left-0 h-screen bg-slate-800 text-white
+    transition-all duration-300 flex flex-col
+    ${isOpen ? "w-56" : "w-0 lg:w-16"} 
+    ${isOpen ? "fixed lg:sticky" : "hidden lg:flex"} 
+  `}
       >
+
         {/* Logo + collapse toggle */}
         <div className="flex items-center justify-between p-4 border-b border-purple-500">
           <div className="flex items-center space-x-2">
-            <span className="text-white text-2xl">⬤</span>
+            <img
+              src="/logo.png"
+              alt="TrackMoney Logo"
+              className="w-8 h-8 object-contain"
+            />
             {isOpen && <span className="text-xl font-bold">TrackMoney</span>}
           </div>
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="hidden lg:block text-gray-200 hover:text-white cursor-pointer"
           >
-            {isOpen ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} /> }
+            {isOpen ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} />}
           </button>
         </div>
 
@@ -63,10 +78,9 @@ export default function Sidebar() {
               to={path}
               className={({ isActive }) =>
                 `flex items-center px-4 py-3 rounded-md transition-all relative group
-                ${
-                  isActive
-                    ? "bg-white text-purple-700 font-semibold shadow-md"
-                    : "text-gray-200 hover:bg-purple-700"
+                ${isActive
+                  ? "bg-white text-purple-700 font-semibold shadow-md"
+                  : "text-gray-200 hover:bg-gray-700"
                 }`
               }
             >

@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from 'react-toastify';
 import axios from "axios";
-import {  AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { AtSign, Lock, User, Phone, Home } from "lucide-react";
 
-// --- A Reusable, Enhanced Input Field Component ---
+
 const InputField = ({ name, type, placeholder, value, onChange, icon }) => (
   <div className="relative">
     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -23,7 +23,7 @@ const InputField = ({ name, type, placeholder, value, onChange, icon }) => (
   </div>
 );
 
-// --- The Main Authentication Page Component ---
+
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({ name: "", address: "", phone: "", email: "", password: "" });
@@ -37,14 +37,14 @@ export default function AuthPage() {
   }, [navigate]);
 
   const handleChange = (e) => {
-    setError(""); // Clear error on new input
+    setError("");
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
    const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(""); // You can keep this for inline errors if you want
+    setError(""); 
     try {
       const endpoint = isLogin ? "login" : "signup";
       const res = await axios.post(`http://localhost:5000/api/auth/${endpoint}`, form);

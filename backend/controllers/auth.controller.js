@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET || "mysecretkey";
 
-// SIGNUP
 exports.signup = async (req, res) => {
   try {
     const { name, address, email, phone, password } = req.body;
@@ -26,7 +25,6 @@ exports.signup = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1d" });
 
-    // Do not send the password back
     user.password = undefined;
 
     res.status(201).json({ message: "Signup successful", token, data: { user } });
@@ -35,7 +33,7 @@ exports.signup = async (req, res) => {
   }
 };
 
-// LOGIN
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -51,8 +49,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1d" });
-    
-    // Do not send the password back
+
     user.password = undefined;
 
     res.status(200).json({ message: "Login successful", token, data: { user } });
@@ -82,7 +79,6 @@ exports.protect = async (req, res, next) => {
       return res.status(401).json({ message: "The user for this token no longer exists" });
     }
 
-    // Grant access to protected route
     req.user = currentUser;
     next();
   } catch (err) {

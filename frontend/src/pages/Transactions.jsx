@@ -20,7 +20,7 @@ const categoryColors = {
   Utilities: "bg-cyan-100 text-cyan-600",
   default: "bg-gray-100 text-gray-600",
 };
-// --- Helper Components for Loading/Error States ---
+
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-64">
     <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>

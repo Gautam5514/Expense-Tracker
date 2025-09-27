@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Briefcase, GraduationCap, DollarSign, Building, Calendar, School } from "lucide-react";
+import Swal from "sweetalert2";
+
 
 const API_BASE_URL = "http://localhost:5000";
 
@@ -35,7 +37,7 @@ export default function Settings() {
   const [personalFormData, setPersonalFormData] = useState({ name: '' });
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  
+
   // --- NEW: State for the Financial Profile Form ---
   const [financialFormData, setFinancialFormData] = useState({
     userType: 'unspecified',
@@ -90,7 +92,7 @@ export default function Settings() {
 
     try {
       const token = localStorage.getItem("token");
-      
+
       // --- Promise 1: Update Personal Info & Photo ---
       const personalData = new FormData();
       personalData.append('name', personalFormData.name);
@@ -105,13 +107,25 @@ export default function Settings() {
       const financialPromise = axios.put(`${API_BASE_URL}/api/users/financial-profile`, financialFormData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       // Wait for both updates to complete
       await Promise.all([personalPromise, financialPromise]);
-      
-      alert("Settings updated successfully!");
+
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Settings updated successfully!",
+        showConfirmButton: false,
+        timer: 2000
+      });
+
     } catch (err) {
-      setError("Failed to update settings. Please try again.");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to update settings. Please try again."
+      });
+
     } finally {
       setLoading(false);
     }
@@ -131,16 +145,16 @@ export default function Settings() {
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-semibold border-b pb-4">Personal Information</h2>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-             <div className="md:col-span-2 space-y-6">
-                 <InputField label="Name" name="name" type="text" value={personalFormData.name} onChange={handlePersonalChange} />
-                 <InputField label="Email Address" name="email" type="email" value={user.email} disabled className="bg-gray-100 cursor-not-allowed"/>
-             </div>
-             <div className="flex flex-col items-center">
-                 <label className="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
-                 <img src={previewImage || profileImageUrl} alt="Profile" className="w-24 h-24 rounded-full border object-cover" />
-                 <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
-                 <button type="button" onClick={() => fileInputRef.current.click()} className="mt-4 px-3 py-2 border rounded-md text-sm hover:bg-gray-50">Change Picture</button>
-             </div>
+            <div className="md:col-span-2 space-y-6">
+              <InputField label="Name" name="name" type="text" value={personalFormData.name} onChange={handlePersonalChange} />
+              <InputField label="Email Address" name="email" type="email" value={user.email} disabled className="bg-gray-100 cursor-not-allowed" />
+            </div>
+            <div className="flex flex-col items-center">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Profile Picture</label>
+              <img src={previewImage || profileImageUrl} alt="Profile" className="w-24 h-24 rounded-full border object-cover" />
+              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
+              <button type="button" onClick={() => fileInputRef.current.click()} className="mt-4 px-3 py-2 border rounded-md text-sm hover:bg-gray-50">Change Picture</button>
+            </div>
           </div>
         </div>
 
@@ -153,10 +167,10 @@ export default function Settings() {
             <div>
               <label className="block text-sm font-medium text-gray-700">Are you a...?</label>
               <div className="mt-2 grid grid-cols-2 gap-4">
-                <button type="button" onClick={() => handleFinancialChange({ target: { name: 'userType', value: 'professional' }})} className={`flex items-center justify-center p-4 border rounded-lg ${financialFormData.userType === 'professional' ? 'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-200' : 'hover:bg-gray-50'}`}>
+                <button type="button" onClick={() => handleFinancialChange({ target: { name: 'userType', value: 'professional' } })} className={`flex items-center justify-center p-4 border rounded-lg ${financialFormData.userType === 'professional' ? 'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-200' : 'hover:bg-gray-50'}`}>
                   <Briefcase className="mr-3" size={20} /> Professional
                 </button>
-                <button type="button" onClick={() => handleFinancialChange({ target: { name: 'userType', value: 'student' }})} className={`flex items-center justify-center p-4 border rounded-lg ${financialFormData.userType === 'student' ? 'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-200' : 'hover:bg-gray-50'}`}>
+                <button type="button" onClick={() => handleFinancialChange({ target: { name: 'userType', value: 'student' } })} className={`flex items-center justify-center p-4 border rounded-lg ${financialFormData.userType === 'student' ? 'bg-indigo-50 border-indigo-500 ring-2 ring-indigo-200' : 'hover:bg-gray-50'}`}>
                   <GraduationCap className="mr-3" size={20} /> Student
                 </button>
               </div>
@@ -165,22 +179,22 @@ export default function Settings() {
             {/* Conditional Fields for Professional */}
             {financialFormData.userType === 'professional' && (
               <div className="p-4 bg-slate-50 rounded-lg space-y-4 animate-fade-in">
-                  <InputField label="Company Name" name="companyName" value={financialFormData.companyName} onChange={handleFinancialChange} placeholder="e.g., Google" />
-                  <InputField label="Salary Date (Day of Month)" name="salaryDate" type="number" min="1" max="31" value={financialFormData.salaryDate} onChange={handleFinancialChange} placeholder="e.g., 28" />
+                <InputField label="Company Name" name="companyName" value={financialFormData.companyName} onChange={handleFinancialChange} placeholder="e.g., Google" />
+                <InputField label="Salary Date (Day of Month)" name="salaryDate" type="number" min="1" max="31" value={financialFormData.salaryDate} onChange={handleFinancialChange} placeholder="e.g., 28" />
               </div>
             )}
-            
+
             {/* Conditional Fields for Student */}
             {financialFormData.userType === 'student' && (
-               <div className="p-4 bg-slate-50 rounded-lg animate-fade-in">
-                  <InputField label="College/University Name" name="collegeName" value={financialFormData.collegeName} onChange={handleFinancialChange} placeholder="e.g., University of Example" />
+              <div className="p-4 bg-slate-50 rounded-lg animate-fade-in">
+                <InputField label="College/University Name" name="collegeName" value={financialFormData.collegeName} onChange={handleFinancialChange} placeholder="e.g., University of Example" />
               </div>
             )}
 
             {/* Common Income Field */}
             {financialFormData.userType !== 'unspecified' && (
               <div className="pt-4 border-t">
-                  <InputField label="Monthly Income / Pocket Money" name="monthlyIncome" type="number" min="0" value={financialFormData.monthlyIncome} onChange={handleFinancialChange} placeholder="Enter your total monthly income" />
+                <InputField label="Monthly Income / Pocket Money" name="monthlyIncome" type="number" min="0" value={financialFormData.monthlyIncome} onChange={handleFinancialChange} placeholder="Enter your total monthly income" />
               </div>
             )}
           </div>

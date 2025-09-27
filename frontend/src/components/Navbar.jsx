@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Bell, MessageSquare } from "lucide-react";
 
 // Define the base URL of your backend
-const API_BASE_URL = "http://localhost:5000";
+const API_URL = "http://localhost:5000";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -19,7 +19,7 @@ export default function Navbar() {
         const token = localStorage.getItem("token");
         if (!token) return; // No user logged in
 
-        const res = await axios.get(`${API_BASE_URL}/api/users/me`, {
+        const res = await axios.get(`${API_URL}/api/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data.data.user);
@@ -49,7 +49,7 @@ export default function Navbar() {
 
   // Construct the full URL for the profile picture
   const profileImageUrl = user?.profilePicture
-    ? `${API_BASE_URL}/${user.profilePicture.replace(/\\/g, '/')}`
+    ? `${API_URL}/${user.profilePicture.replace(/\\/g, '/')}`
     : 'https://i.pravatar.cc/150'; // A fallback avatar
 
   return (
@@ -57,8 +57,6 @@ export default function Navbar() {
       <h1 className="text-lg font-semibold">TrackMoney</h1>
 
       <div className="flex items-center space-x-6">
-        <button className="text-gray-600 hover:text-gray-800"><MessageSquare size={22} /></button>
-        <button className="text-gray-600 hover:text-gray-800"><Bell size={22} /></button>
 
         {/* Profile dropdown */}
         <div className="relative" ref={dropdownRef}>

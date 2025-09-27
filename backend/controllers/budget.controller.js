@@ -1,34 +1,27 @@
-// controllers/budget.controller.js
 
 const Budget = require("../models/budget.model");
 const Transaction = require("../models/transaction.model");
 
-// GET all budgets with their current SPENDING FOR A SPECIFIC MONTH
 exports.getBudgets = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // --- NEW: Calculate start and end dates for the selected month ---
         const year = parseInt(req.query.year) || new Date().getFullYear();
-        const month = parseInt(req.query.month) || new Date().getMonth() + 1; // JS month is 0-11
+        const month = parseInt(req.query.month) || new Date().getMonth() + 1;
         const startDate = new Date(year, month - 1, 1);
         const endDate = new Date(year, month, 0, 23, 59, 59);
-        // --- END NEW ---
 
-        // 1. Find all budget definitions for the user
         const budgets = await Budget.find({ user: userId }).lean();
 
         if (budgets.length === 0) {
             return res.status(200).json({ data: { budgets: [] } });
         }
 
-        // 2. Aggregate spending PER CATEGORY for the selected month
         const spendingByCategory = await Transaction.aggregate([
             {
                 $match: {
                     user: req.user._id,
                     type: 'expense',
-                    // --- CHANGED: Added date filter to the match stage ---
                     date: { $gte: startDate, $lte: endDate }
                 },
             },

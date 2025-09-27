@@ -20,10 +20,10 @@ const ErrorDisplay = ({ message }) => (
     <span className="block sm:inline"> {message}</span>
   </div>
 );
-
+  
 const StatCard = ({ title, value, children, bgColor = 'bg-white' }) => (
   <div className={`${bgColor} shadow-sm rounded-lg p-5`}>
-    <p className="text-gray-500 text-sm font-medium">{title}</p>
+    <p className="text-slate-900  text-sm font-medium">{title}</p>
     <h2 className="text-2xl font-bold text-gray-800 mt-1">{value}</h2>
     {children}
   </div>
@@ -97,16 +97,16 @@ export default function Dashboard() {
           <div className="flex items-center gap-2">
             <button
               onClick={handlePreviousMonth}
-              className="p-1 rounded-md hover:bg-gray-100"
+              className="p-1 rounded-md hover:bg-indigo-600"
             >
               <ChevronLeft size={20} />
             </button>
-            <span className="font-semibold text-gray-600 text-lg w-36 text-center">
+            <span className="font-semibold text-slate-900  text-lg w-36 text-center">
               {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
             </span>
             <button
               onClick={handleNextMonth}
-              className="p-1 rounded-md hover:bg-gray-100"
+              className="p-1 rounded-md hover:bg-indigo-600"
             >
               <ChevronRight size={20} />
             </button>
@@ -116,7 +116,7 @@ export default function Dashboard() {
         {/* Right Section: Add Expense Button */}
         <button
           onClick={handleOpenModal}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-900  bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700"
         >
           <Plus size={16} /> Add Expense
         </button>
@@ -156,8 +156,8 @@ export default function Dashboard() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 bg-white shadow-sm rounded-lg p-4">
-          <h3 className="text-gray-600 font-medium mb-4">Daily Spending</h3>
+        <div className="lg:col-span-3 bg-slate-100 shadow-sm rounded-lg p-4">
+          <h3 className="text-slate-900  font-medium mb-4">Daily Spending</h3>
           <ResponsiveContainer width="100%" height={300}>
             {/* Using spendingOverTime data from the report */}
             <LineChart data={spendingOverTime}>
@@ -172,7 +172,7 @@ export default function Dashboard() {
         </div>
 
         <div className="lg:col-span-2 bg-white shadow-sm rounded-lg p-4">
-          <h3 className="text-gray-600 font-medium mb-4">Category Breakdown</h3>
+          <h3 className="text-slate-900  font-medium mb-4">Category Breakdown</h3>
           <ResponsiveContainer width="100%" height={300}>
             {/* Using spendingByCategory data from the report */}
             <PieChart>

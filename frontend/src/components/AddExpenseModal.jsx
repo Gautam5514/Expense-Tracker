@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { 
-    X, 
-    Calendar as CalendarIcon, 
-    UploadCloud, 
-    Wallet, 
-    LayoutGrid, 
-    Building, 
-    CreditCard, 
+import {
+    X,
+    Calendar as CalendarIcon,
+    UploadCloud,
+    Wallet,
+    LayoutGrid,
+    Building,
+    CreditCard,
     Tags as TagsIcon,
     FileText,
     Paperclip
@@ -56,7 +56,10 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
                     category: transactionToEdit.category || "",
                     merchant: transactionToEdit.merchant || "",
                     paymentMethod: transactionToEdit.paymentMethod || "Credit Card",
-                    tags: Array.isArray(transactionToEdit.tags) ? transactionToEdit.tags.join(', ') : "",
+                    tags: Array.isArray(transactionToEdit.tags)
+                        ? transactionToEdit.tags.join(', ')
+                        : transactionToEdit.tags || "",
+
                     notes: transactionToEdit.notes || "",
                 });
                 // Note: We don't pre-fill the existing attachment for security/simplicity reasons
@@ -82,7 +85,7 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
     if (!isOpen) return null;
 
     const handleChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -94,7 +97,7 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
     const handleRemoveAttachment = () => {
         setAttachment(null);
         setAttachmentPreview(null);
-        if(fileInputRef.current) {
+        if (fileInputRef.current) {
             fileInputRef.current.value = ""; // Reset the file input
         }
     };
@@ -106,12 +109,20 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
         const apiData = new FormData();
         Object.keys(formData).forEach(key => {
             if (key === 'tags') {
-                // Split tags string into an array for the backend
-                apiData.append(key, JSON.stringify(formData[key].split(',').map(tag => tag.trim()).filter(Boolean)));
+                apiData.append(
+                    key,
+                    formData[key]
+                        .split(',')
+                        .map(tag => tag.trim())
+                        .filter(Boolean)
+                        .join(',')
+                );
             } else {
                 apiData.append(key, formData[key]);
             }
         });
+
+
 
         if (attachment) apiData.append("attachment", attachment);
         apiData.append("type", "expense");
@@ -125,7 +136,7 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
             } else {
                 await axios.post("http://localhost:5000/api/transactions", apiData, { headers });
             }
-            
+
             if (shouldCloseOnSave) {
                 onClose();
             } else {
@@ -139,7 +150,7 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
             setLoading(false);
         }
     };
-    
+
     // Helper to format file size for display
     const formatFileSize = (bytes) => {
         if (bytes === 0) return '0 Bytes';
@@ -181,16 +192,16 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
                                     </datalist>
                                 </div>
                             </div>
-                             <div>
+                            <div>
                                 <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-1.5">Payment Method</label>
-                                 <div className="relative">
-                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <div className="relative">
+                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                         <CreditCard size={18} className="text-gray-400" />
-                                     </div>
+                                    </div>
                                     <select id="paymentMethod" name="paymentMethod" value={formData.paymentMethod} onChange={handleChange} className="w-full rounded-lg border-gray-300 py-2.5 pl-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                         <option>Credit Card</option> <option>Debit Card</option> <option>Cash</option> <option>Bank Transfer</option>
                                     </select>
-                                 </div>
+                                </div>
                             </div>
                         </div>
 
