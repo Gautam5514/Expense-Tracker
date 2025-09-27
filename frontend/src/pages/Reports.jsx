@@ -16,6 +16,8 @@ const LoadingSpinner = () => (
   </div>
 );
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const generateDateOptions = () => {
     const options = [];
     // Always add your sample data's date for testing
@@ -50,7 +52,7 @@ export default function Reports() {
         setLoading(true);
         const [year, month] = selectedDate.split('-');
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:5000/api/reports/monthly-summary?year=${year}&month=${month}`, {
+        const res = await axios.get(`${API_URL}/api/reports/monthly-summary?year=${year}&month=${month}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setReportData(res.data.data);
@@ -85,7 +87,7 @@ const handleExportPDF = async () => {
 
         // 1. Make an authorized API request using Axios.
         // The key is `responseType: 'blob'`, which tells Axios to expect a file.
-        const response = await axios.get(`http://localhost:5000/api/reports/monthly-summary/download-pdf?year=${year}&month=${month}`, {
+        const response = await axios.get(`${API_URL}/api/reports/monthly-summary/download-pdf?year=${year}&month=${month}`, {
             headers: {
                 Authorization: `Bearer ${token}` // Send the token in the header
             },
@@ -130,7 +132,7 @@ const handleExportPDF = async () => {
       const hasData = summary.totalSpending > 0 || summary.totalIncome > 0;
 
   return (
-       <div className="space-y-8">
+      <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold">Reports</h1>
         <p className="text-gray-500">Analyze your spending patterns with detailed reports.</p>

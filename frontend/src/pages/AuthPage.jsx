@@ -5,6 +5,8 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { AtSign, Lock, User, Phone, Home } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 
 const InputField = ({ name, type, placeholder, value, onChange, icon }) => (
   <div className="relative">
@@ -47,7 +49,7 @@ export default function AuthPage() {
     setError(""); 
     try {
       const endpoint = isLogin ? "login" : "signup";
-      const res = await axios.post(`http://localhost:5000/api/auth/${endpoint}`, form);
+      const res = await axios.post(`${API_URL}/api/auth/${endpoint}`, form);
       localStorage.setItem("token", res.data.token);
       
       toast.success(isLogin ? "Login Successful!" : "Account created successfully!");

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LayoutGrid, PieChart, Target, Zap } from "lucide-react";
 
-// --- Sub-Components for a Cleaner Structure ---
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const FeatureCard = ({ icon, title, children }) => (
   <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">

@@ -3,6 +3,8 @@ import axios from "axios";
 import { Edit, Trash2, MoreVertical, ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import AddCategoryModal from '../components/AddCategoryModal'; // Only one import needed now
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const categoryVisuals = {
   "Groceries": { icon: "🛒", color: "bg-green-500" },
   "Food & Dining": { icon: "🍴", color: "bg-orange-500" },
@@ -43,8 +45,8 @@ export default function Categories() {
       setLoading(true);
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1;
-      
-      const res = await axios.get(`http://localhost:5000/api/categories?year=${year}&month=${month}`, {
+
+      const res = await axios.get(`${API_URL}/api/categories?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategories(res.data.data.categories);
@@ -85,7 +87,7 @@ export default function Categories() {
     setActiveMenu(null);
     if (window.confirm(`Delete "${category.name}"? This also removes it from your category list.`)) {
       try {
-        await axios.delete(`http://localhost:5000/api/categories/${category._id}`, { headers: { Authorization: `Bearer ${token}` } });
+        await axios.delete(`${API_URL}/api/categories/${category._id}`, { headers: { Authorization: `Bearer ${token}` } });
         fetchData();
       } catch (err) {
         alert('Failed to delete category.');

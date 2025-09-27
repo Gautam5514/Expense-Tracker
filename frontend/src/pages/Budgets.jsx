@@ -6,6 +6,8 @@ import AddBudgetModal from "../components/AddBudgetModal";
 
 const COLORS = ["bg-indigo-500", "bg-purple-500", "bg-pink-500", "bg-cyan-500", "bg-emerald-500"];
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const LoadingSkeleton = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {Array.from({ length: 3 }).map((_, i) => (
@@ -39,7 +41,7 @@ export default function Budgets() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1;
 
-      const res = await axios.get(`http://localhost:5000/api/budgets?year=${year}&month=${month}`, {
+      const res = await axios.get(`${API_URL}/api/budgets?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBudgets(res.data.data.budgets);
@@ -77,7 +79,7 @@ export default function Budgets() {
     if (window.confirm(`Are you sure you want to delete the budget for "${budget.category}"?`)) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:5000/api/budgets/${budget._id}`, {
+        await axios.delete(`${API_URL}/api/budgets/${budget._id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchData();

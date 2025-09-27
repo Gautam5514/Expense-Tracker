@@ -27,6 +27,8 @@ const LoadingSpinner = () => (
   </div>
 );
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 export default function Transactions() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [transactions, setTransactions] = useState([]);
@@ -55,7 +57,7 @@ export default function Transactions() {
       const month = currentDate.getMonth() + 1; // getMonth() is 0-indexed
 
       // Append year and month to the request URL
-      const res = await axios.get(`http://localhost:5000/api/transactions?year=${year}&month=${month}`, {
+      const res = await axios.get(`${API_URL}/api/transactions?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -168,7 +170,7 @@ export default function Transactions() {
           // 3. If confirmed, proceed with the deletion logic
           const token = localStorage.getItem("token");
           const deletePromises = idsToDelete.map(id =>
-            axios.delete(`http://localhost:5000/api/transactions/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+            axios.delete(`${API_URL}/api/transactions/${id}`, { headers: { Authorization: `Bearer ${token}` } })
           );
           await Promise.all(deletePromises);
           

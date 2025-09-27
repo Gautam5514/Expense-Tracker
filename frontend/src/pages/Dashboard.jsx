@@ -7,6 +7,8 @@ import {
   ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 // --- Helper Components ---
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-64">
@@ -46,7 +48,7 @@ export default function Dashboard() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1;
 
-      const res = await axios.get(`http://localhost:5000/api/reports/monthly-summary?year=${year}&month=${month}`, {
+      const res = await axios.get(`${API_URL}/api/reports/monthly-summary?year=${year}&month=${month}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setReportData(res.data.data);

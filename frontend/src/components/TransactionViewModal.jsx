@@ -1,6 +1,8 @@
 import { X, Calendar, Building, CreditCard, Tags, FileText, Download, Edit, Trash2, Maximize2 } from 'lucide-react';
 import { useState } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 // A self-contained Lightbox/Overlay component for viewing images
 const ImageViewerOverlay = ({ isOpen, onClose, imageUrl }) => {
     if (!isOpen) return null;
@@ -32,7 +34,7 @@ export default function TransactionViewModal({ isOpen, onClose, transaction, onE
     if (!isOpen || !transaction) return null;
 
     const isExpense = transaction.type === 'expense';
-    const attachmentUrl = transaction.attachment ? `http://localhost:5000/${transaction.attachment.replace(/\\/g, '/')}` : null;
+    const attachmentUrl = transaction.attachment ? `${API_URL}/${transaction.attachment.replace(/\\/g, '/')}` : null;
     const isImage = attachmentUrl && /\.(jpg|jpeg|png|gif|webp)$/i.test(attachmentUrl);
 
     return (

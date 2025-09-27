@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { X } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 export default function AddCategoryModal({ isOpen, onClose, categoryToEdit }) {
     // Determine mode based on the presence of categoryToEdit prop
     const isEditMode = Boolean(categoryToEdit);
@@ -46,13 +48,13 @@ export default function AddCategoryModal({ isOpen, onClose, categoryToEdit }) {
                     setLoading(false);
                     return;
                 }
-                await axios.put('http://localhost:5000/api/categories/update-name', 
+                await axios.put(`${API_URL}/api/categories/update-name`, 
                     { oldName: categoryToEdit.name, newName: name }, 
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } else {
                 // --- ADD LOGIC ---
-                await axios.post('http://localhost:5000/api/categories', 
+                await axios.post(`${API_URL}/api/categories`, 
                     { name }, 
                     { headers: { Authorization: `Bearer ${token}` } }
                 );

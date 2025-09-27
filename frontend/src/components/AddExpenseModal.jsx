@@ -15,6 +15,8 @@ import {
 
 // --- Sub-Components for a Cleaner Structure ---
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 // Enhanced InputField with Icon support
 const InputField = ({ icon, label, ...props }) => (
     <div>
@@ -132,9 +134,9 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
             const headers = { Authorization: `Bearer ${token}` };
 
             if (isEditMode) {
-                await axios.put(`http://localhost:5000/api/transactions/${transactionToEdit._id}`, apiData, { headers });
+                await axios.put(`${API_URL}/api/transactions/${transactionToEdit._id}`, apiData, { headers });
             } else {
-                await axios.post("http://localhost:5000/api/transactions", apiData, { headers });
+                await axios.post(`${API_URL}/api/transactions`, apiData, { headers });
             }
 
             if (shouldCloseOnSave) {

@@ -4,7 +4,8 @@ import { Briefcase, GraduationCap, DollarSign, Building, Calendar, School } from
 import Swal from "sweetalert2";
 
 
-const API_BASE_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-64">
@@ -54,7 +55,7 @@ export default function Settings() {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_BASE_URL}/api/users/me`, {
+        const res = await axios.get(`${API_URL}/api/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const fetchedUser = res.data.data.user;
@@ -99,12 +100,12 @@ export default function Settings() {
       if (profileImageFile) {
         personalData.append('profilePicture', profileImageFile);
       }
-      const personalPromise = axios.put(`${API_BASE_URL}/api/users/updateMe`, personalData, {
+      const personalPromise = axios.put(`${API_URL}/api/users/updateMe`, personalData, {
         headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
       });
 
       // --- Promise 2: Update Financial Profile ---
-      const financialPromise = axios.put(`${API_BASE_URL}/api/users/financial-profile`, financialFormData, {
+      const financialPromise = axios.put(`${API_URL}/api/users/financial-profile`, financialFormData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -134,7 +135,7 @@ export default function Settings() {
   if (loading) return <LoadingSpinner />;
   if (error) return <div className="text-red-500 text-center p-6">{error}</div>;
 
-  const profileImageUrl = user.profilePicture ? `${API_BASE_URL}/${user.profilePicture.replace(/\\/g, '/')}` : `https://ui-avatars.com/api/?name=${user.name}&background=random`;
+  const profileImageUrl = user.profilePicture ? `${API_URL}/${user.profilePicture.replace(/\\/g, '/')}` : `https://ui-avatars.com/api/?name=${user.name}&background=random`;
 
   return (
     <div className="space-y-8">

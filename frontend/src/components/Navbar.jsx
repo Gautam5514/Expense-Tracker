@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Bell, MessageSquare } from "lucide-react";
 
 // Define the base URL of your backend
-const API_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);

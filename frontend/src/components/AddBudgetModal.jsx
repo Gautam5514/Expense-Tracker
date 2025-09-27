@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 export default function AddBudgetModal({ isOpen, onClose, budgetToEdit }) {
     const isEditMode = Boolean(budgetToEdit);
 
@@ -46,12 +48,12 @@ export default function AddBudgetModal({ isOpen, onClose, budgetToEdit }) {
 
             if (isEditMode) {
                 // --- EDIT LOGIC ---
-                await axios.put(`http://localhost:5000/api/budgets/${budgetToEdit._id}`, payload, {
+                await axios.put(`${API_URL}/api/budgets/${budgetToEdit._id}`, payload, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
             } else {
                 // --- ADD LOGIC ---
-                await axios.post("http://localhost:5000/api/budgets", payload, {
+                await axios.post(`${API_URL}/api/budgets`, payload, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
             }
