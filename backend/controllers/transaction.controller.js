@@ -1,6 +1,7 @@
 // controllers/transaction.controller.js
 const Transaction = require("../models/transaction.model");
 const Budget = require("../models/budget.model"); 
+const { predictCategory } = require("../utils/aiCategorizer");
 
 
 exports.getTransactions = async (req, res) => {
@@ -43,38 +44,41 @@ exports.getTransactions = async (req, res) => {
 
 exports.addTransaction = async (req, res) => {
   try {
-    // Get the category from the request body. We need it for the budget check.
-    const { category } = req.body;
+    let { category, merchant, notes } = req.body;
 
-    // <-- 2. ADD THIS ENTIRE BLOCK for auto-creating budgets
-    // This logic runs before creating the transaction.
+    // ✅ If user didn't choose a category, let AI guess it
+    if (!category || category.trim() === "") {
+      const combinedText = `${merchant || ""} ${notes || ""}`;
+      category = await predictCategory(combinedText);
+      req.body.category = category;
+    }
+
+    // ✅ Auto-create budget if not exists
     if (category) {
       await Budget.findOneAndUpdate(
-        // Condition: Find a budget for this user with this category (case-insensitive)
-        { 
-          user: req.user.id, 
-          category: { $regex: new RegExp(`^${category}$`, 'i') } 
+        {
+          user: req.user.id,
+          category: { $regex: new RegExp(`^${category}$`, "i") },
         },
-        // Update: If it's not found, set these values on insert ($setOnInsert)
-        { 
-          $setOnInsert: { 
-            user: req.user.id, 
-            category: category, 
-            limit: 0 // Default limit for auto-created budgets
-          } 
+        {
+          $setOnInsert: {
+            user: req.user.id,
+            category: category,
+            limit: 0,
+          },
         },
-        // Options: 'upsert: true' means CREATE the document if it doesn't exist
         { upsert: true }
       );
     }
-    // END OF THE NEW BLOCK
 
-    // The rest of your function continues exactly as before
+    // ✅ Create new transaction
     const newTransactionData = {
       ...req.body,
       user: req.user.id,
-      type: 'expense', 
-      tags: req.body.tags ? req.body.tags.split(',').map(tag => tag.trim()) : [],
+      type: "expense",
+      tags: req.body.tags
+        ? req.body.tags.split(",").map((tag) => tag.trim())
+        : [],
     };
 
     if (req.file) {
@@ -82,12 +86,13 @@ exports.addTransaction = async (req, res) => {
     }
 
     const transaction = await Transaction.create(newTransactionData);
-
     res.status(201).json({ data: { transaction } });
   } catch (error) {
+    console.error("Add Transaction Error:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 

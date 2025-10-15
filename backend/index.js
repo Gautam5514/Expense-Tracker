@@ -10,6 +10,7 @@ const categoryRoutes = require("./routes/category.routes");
 const budgetRoutes = require("./routes/budget.routes");
 const reportRoutes = require("./routes/report.routes");
 const userRoutes = require("./routes/user.route");
+const aiRoutes = require("./routes/ai.routes");
 dotenv.config();
 
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -40,6 +41,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Connect DB
 connectDB();

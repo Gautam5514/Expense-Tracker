@@ -10,6 +10,7 @@ import Categories from "./pages/Categories";
 import Transactions from "./pages/Transactions";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import AIAssistant from "./components/AIAssistant";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
           <Route path="/transactions" element={<Transactions/>}/>
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/ai/chat" element={<AIAssistant />} />
         </Route>
 
         {/* Fallback */}

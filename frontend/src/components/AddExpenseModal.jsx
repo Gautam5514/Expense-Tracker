@@ -12,6 +12,7 @@ import {
     FileText,
     Paperclip
 } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 
 // --- Sub-Components for a Cleaner Structure ---
 
@@ -45,6 +46,8 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
     const [attachment, setAttachment] = useState(null);
     const [attachmentPreview, setAttachmentPreview] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [suggestions, setSuggestions] = useState({ category: null, tags: [] });
+    const [isSuggesting, setIsSuggesting] = useState(false);
     const fileInputRef = useRef(null);
     const isEditMode = Boolean(transactionToEdit);
 
@@ -72,6 +75,7 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
             // Reset everything when modal is not open
             setAttachment(null);
             setAttachmentPreview(null);
+            setSuggestions({ category: null, tags: [] });
         }
     }, [transactionToEdit, isOpen]);
 
@@ -87,6 +91,48 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
     if (!isOpen) return null;
 
     const handleChange = (e) => setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+    const handleGetSuggestions = async () => {
+        const description = `${formData.merchant} ${formData.notes}`.trim();
+
+        // Don't run for very short descriptions
+        if (description.length < 3) {
+            setSuggestions({ category: null, tags: [] }); // Clear old suggestions
+            return;
+        }
+
+        setIsSuggesting(true);
+        try {
+            const token = localStorage.getItem("token");
+            const { data } = await axios.post(
+                `${API_URL}/api/ai/suggest-details`,
+                { description },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            if (data) {
+                setSuggestions(data);
+                // Auto-fill category if it's empty and the AI provided one
+                if (!formData.category && data.category) {
+                    setFormData(prev => ({ ...prev, category: data.category }));
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch AI suggestions:", error);
+            setSuggestions({ category: null, tags: [] }); // Clear on error
+        } finally {
+            setIsSuggesting(false);
+        }
+    };
+
+    // ✅ NEW FUNCTION to handle clicking a suggested tag
+    const handleAddTag = (tagToAdd) => {
+        const currentTags = formData.tags.split(',').map(t => t.trim()).filter(Boolean);
+        if (!currentTags.includes(tagToAdd)) {
+            const newTags = [...currentTags, tagToAdd].join(', ');
+            setFormData(prev => ({ ...prev, tags: newTags }));
+        }
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -209,11 +255,38 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
 
                         {/* --- Right Column --- */}
                         <div className="space-y-6">
-                            <InputField icon={<Building size={18} className="text-gray-400" />} label="Merchant" name="merchant" value={formData.merchant} onChange={handleChange} placeholder="e.g., Amazon, Starbucks" />
+                            <InputField icon={<Building size={18} className="text-gray-400" />} label="Merchant" name="merchant" value={formData.merchant} onChange={handleChange} onBlur={handleGetSuggestions} placeholder="e.g., Amazon, Starbucks" />
                             <InputField icon={<TagsIcon size={18} className="text-gray-400" />} label="Tags (comma-separated)" name="tags" value={formData.tags} onChange={handleChange} placeholder="e.g., work, personal, food" />
+
+                            {/* ✅ NEW: AI Suggestions Area */}
+                            {(isSuggesting || suggestions.tags.length > 0) && (
+                                <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
+                                    <div className="flex items-center gap-2 mb-2 text-sm font-medium text-indigo-800">
+                                        <Lightbulb size={16} />
+                                        <span>AI Suggestions</span>
+                                    </div>
+                                    {isSuggesting ? (
+                                        <p className="text-xs text-indigo-700">Generating ideas...</p>
+                                    ) : (
+                                        <div className="flex flex-wrap gap-2">
+                                            {suggestions.tags.map(tag => (
+                                                <button
+                                                    key={tag}
+                                                    type="button"
+                                                    onClick={() => handleAddTag(tag)}
+                                                    className="px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-white border border-indigo-300 rounded-full hover:bg-indigo-100 transition-colors"
+                                                >
+                                                    + {tag}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             <div>
                                 <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
-                                <textarea id="notes" name="notes" rows="4" value={formData.notes} onChange={handleChange} placeholder="Add any details..." className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                                <textarea id="notes" name="notes" rows="4" value={formData.notes} onChange={handleChange} onBlur={handleGetSuggestions} placeholder="Add any details..." className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
                             </div>
                         </div>
 

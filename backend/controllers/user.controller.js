@@ -43,8 +43,6 @@ exports.updateFinancialProfile = async (req, res) => {
             monthlyIncome
         } = req.body;
 
-        // Construct the update object from the request body
-        // This ensures we only update fields that are provided
         const profileUpdates = {
             'financialProfile.userType': userType,
             'financialProfile.companyName': companyName,
@@ -52,15 +50,13 @@ exports.updateFinancialProfile = async (req, res) => {
             'financialProfile.collegeName': collegeName,
             'financialProfile.monthlyIncome': monthlyIncome,
         };
-        
-        // Remove any undefined properties so we don't overwrite existing data with nulls
+
         Object.keys(profileUpdates).forEach(key => profileUpdates[key] === undefined && delete profileUpdates[key]);
 
-        // Find the user and update their financialProfile
         const updatedUser = await User.findByIdAndUpdate(
             req.user.id,
             { $set: profileUpdates },
-            { new: true, runValidators: true } // Return the updated document
+            { new: true, runValidators: true }
         );
 
         res.status(200).json({

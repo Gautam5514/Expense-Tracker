@@ -44,8 +44,10 @@ export default function Reports() {
   
   const dateOptions = generateDateOptions();
   // Default to your sample data date for easy testing
-  const [selectedDate, setSelectedDate] = useState('2025-9');
-
+ const [selectedDate, setSelectedDate] = useState(() => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+});
   useEffect(() => {
     const fetchData = async () => {
       try {
