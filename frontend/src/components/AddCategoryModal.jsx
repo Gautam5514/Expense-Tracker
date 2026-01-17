@@ -79,29 +79,29 @@ export default function AddCategoryModal({ isOpen, onClose, categoryToEdit }) {
 
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
-                <div className="p-5 border-b flex justify-between items-center">
-                    <h2 className="text-xl font-bold text-gray-800">{title}</h2>
-                    <button onClick={handleClose} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-white/70">
+                <div className="p-5 border-b border-slate-100 flex justify-between items-center">
+                    <h2 className="text-xl font-semibold text-[var(--ink-900)]">{title}</h2>
+                    <button onClick={handleClose} className="text-[var(--ink-500)] hover:text-[var(--ink-900)]"><X size={22} /></button>
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="p-6">
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">{labelText}</label>
+                        <label htmlFor="name" className="block text-sm font-medium text-[var(--ink-700)] mb-1">{labelText}</label>
                         <input
                             type="text"
                             id="name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="e.g., Health & Wellness"
-                            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)]"
                             required
                         />
                         {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
                     </div>
-                    <div className="bg-gray-50 p-4 flex justify-end space-x-3 rounded-b-xl">
-                        <button type="button" onClick={handleClose} className="px-4 py-2 text-sm font-medium border rounded-lg hover:bg-gray-50">Cancel</button>
-                        <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow disabled:opacity-50">
+                    <div className="bg-slate-50 p-4 flex justify-end space-x-3 rounded-b-2xl">
+                        <button type="button" onClick={handleClose} className="btn-secondary text-sm">Cancel</button>
+                        <button type="submit" disabled={loading} className="btn-primary text-sm disabled:opacity-50">
                             {loading ? 'Saving...' : buttonText}
                         </button>
                     </div>

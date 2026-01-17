@@ -4,14 +4,14 @@ import { MoreVertical, Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-re
 import AddExpenseModal from "../components/AddExpenseModal";
 import AddBudgetModal from "../components/AddBudgetModal";
 
-const COLORS = ["bg-indigo-500", "bg-purple-500", "bg-pink-500", "bg-cyan-500", "bg-emerald-500"];
+const COLORS = ["bg-emerald-500", "bg-amber-500", "bg-sky-500", "bg-rose-500", "bg-slate-500"];
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const LoadingSkeleton = () => (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {Array.from({ length: 3 }).map((_, i) => (
-      <div key={i} className="p-5 rounded-lg bg-white shadow animate-pulse">
+      <div key={i} className="p-5 rounded-2xl bg-white/70 border border-white/60 shadow-lg animate-pulse">
         <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
         <div className="h-2 bg-gray-200 rounded-full mb-3"></div>
         <div className="flex justify-between">
@@ -104,24 +104,27 @@ export default function Budgets() {
   const availableCategories = budgets.map(b => b.category);
 
   return (
-    <main className="flex-1 p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-2 flex-wrap gap-4">
         {/* Left Section: Title + Month Nav */}
         <div className="flex items-center gap-6">
-          <h1 className="text-2xl font-bold whitespace-nowrap">Budgets Overview</h1>
+          <div>
+            <h1 className="text-3xl font-semibold font-display whitespace-nowrap">Budgets</h1>
+            <p className="text-sm text-[var(--ink-500)]">Stay ahead of your spending caps.</p>
+          </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handlePreviousMonth}
-              className="p-1 rounded-md hover:bg-gray-100"
+              className="btn-ghost px-3 py-2"
             >
               <ChevronLeft size={20} />
             </button>
-            <span className="font-semibold text-gray-600 text-lg w-36 text-center">
+            <span className="font-semibold text-[var(--ink-700)] text-lg w-36 text-center">
               {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
             </span>
             <button
               onClick={handleNextMonth}
-              className="p-1 rounded-md hover:bg-gray-100"
+              className="btn-ghost px-3 py-2"
             >
               <ChevronRight size={20} />
             </button>
@@ -129,16 +132,16 @@ export default function Budgets() {
         </div>
 
         {/* Right Section: Buttons */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <button
             onClick={() => setIsExpenseModalOpen(true)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow"
+            className="btn-primary text-sm"
           >
             + Add Expense
           </button>
           <button
             onClick={handleOpenAddModal}
-            className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+            className="btn-secondary text-sm"
           >
             + New Budget
           </button>
@@ -164,23 +167,23 @@ export default function Budgets() {
                 // CORRECTED: Changed < to <div
                 <div
                   key={b._id}
-                  className={`p-5 rounded-lg border ${overspent ? "border-red-300 bg-red-50" : "bg-white shadow"}`}
+                  className={`p-5 app-card ${overspent ? "border-red-200 bg-red-50/70" : ""}`}
                 >
                   {/* CORRECTED: Menu is now inside the header for proper layout */}
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h2 className="font-semibold text-gray-800">{b.category}</h2>
-                      <span className={`text-sm font-medium ${overspent ? "text-red-600" : "text-gray-500"}`}>
+                      <h2 className="font-semibold text-[var(--ink-900)]">{b.category}</h2>
+                      <span className={`text-sm font-medium ${overspent ? "text-red-600" : "text-[var(--ink-500)]"}`}>
                         {percent}% Used
                       </span>
                     </div>
                     <div className="relative" ref={activeMenu === b._id ? menuRef : null}>
-                      <button onClick={() => handleToggleMenu(b._id)} className="text-gray-400 hover:text-gray-600 p-1 -mr-1">
+                      <button onClick={() => handleToggleMenu(b._id)} className="text-[var(--ink-500)] hover:text-[var(--ink-900)] p-1 -mr-1">
                         <MoreVertical size={18} />
                       </button>
                       {activeMenu === b._id && (
-                        <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-20 border">
-                          <a onClick={() => handleOpenEditModal(b)} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                        <div className="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg z-20 border border-slate-100">
+                          <a onClick={() => handleOpenEditModal(b)} className="flex items-center px-4 py-2 text-sm text-[var(--ink-700)] hover:bg-slate-50 cursor-pointer">
                             <Edit size={14} className="mr-2" /> Edit
                           </a>
                           <a onClick={() => handleDelete(b)} className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer">
@@ -191,7 +194,7 @@ export default function Budgets() {
                     </div>
                   </div>
 
-                  <div className="w-full bg-gray-200 h-2 rounded-full mb-2">
+                  <div className="w-full bg-slate-200/70 h-2 rounded-full mb-2">
                     <div
                       className={`h-2 rounded-full ${overspent ? 'bg-red-500' : COLORS[i % COLORS.length]}`}
                       style={{ width: `${Math.min(percent, 100)}%` }}
@@ -199,18 +202,18 @@ export default function Budgets() {
                   </div>
 
                   <div className="flex justify-between text-sm mb-1">
-                    <span className={overspent ? "text-red-600 font-medium" : "text-gray-500"}>
+                    <span className={overspent ? "text-red-600 font-medium" : "text-[var(--ink-500)]"}>
                       {overspent
                         ? `${(Math.abs(remaining)).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} overspent`
                         : `${remaining.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} remaining`}
                     </span>
-                    <span className="font-medium text-gray-800">
+                    <span className="font-medium text-[var(--ink-900)]">
                       {`${(b.spent).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} / ${(b.limit).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}`}
                     </span>
                   </div>
 
                   {percent > 85 && !overspent && (
-                    <p className="text-xs mt-1 text-yellow-600">
+                    <p className="text-xs mt-1 text-amber-600">
                       ! Nearing budget limit.
                     </p>
                   )}
@@ -223,9 +226,9 @@ export default function Budgets() {
               );
             })
           ) : (
-            <div className="md:col-span-2 lg:col-span-3 text-center py-12 bg-white rounded-lg shadow">
-              <h3 className="text-lg font-medium text-gray-800">No budgets found for this month.</h3>
-              <p className="text-gray-500 mt-1">Click the "+ New Budget" button to create one.</p>
+            <div className="md:col-span-2 lg:col-span-3 text-center py-12 app-card">
+              <h3 className="text-lg font-medium text-[var(--ink-900)]">No budgets found for this month.</h3>
+              <p className="text-[var(--ink-500)] mt-1">Click the "+ New Budget" button to create one.</p>
             </div>
           )}
         </div>
@@ -238,6 +241,6 @@ export default function Budgets() {
         onClose={handleCloseModal}
         budgetToEdit={budgetToEdit}
       />
-    </main>
+    </div>
   );
 }

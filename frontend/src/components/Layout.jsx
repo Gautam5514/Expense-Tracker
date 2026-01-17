@@ -9,12 +9,14 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex app-shell text-[var(--ink-900)]">
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Navbar />
-        <main className="flex-1 p-8 overflow-y-auto">
-          <Outlet />
+        <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+          <div className="mx-auto w-full max-w-[1200px]">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

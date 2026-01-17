@@ -68,18 +68,18 @@ export default function AIAssistant() {
         return (
             <button
                 onClick={() => setOpen(true)}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
+                className="btn-primary btn-icon rounded-full shadow-lg"
             >
                 <MessageCircle size={22} />
             </button>
         );
 
     return (
-        <div className="w-96 bg-white shadow-2xl border border-gray-200 rounded-xl p-4">
+        <div className="w-96 app-card p-4">
             {/* Header */}
             <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-semibold text-gray-800">💬 AI Expense Assistant</h3>
-                <button onClick={() => setOpen(false)} className="text-gray-600 hover:text-gray-900">
+                <h3 className="text-lg font-semibold text-[var(--ink-900)]">AI Expense Assistant</h3>
+                <button onClick={() => setOpen(false)} className="text-[var(--ink-500)] hover:text-[var(--ink-900)]">
                     <X size={18} />
                 </button>
             </div>
@@ -87,24 +87,24 @@ export default function AIAssistant() {
             {/* Chat Box */}
             <div
                 ref={chatRef}
-                className="h-72 overflow-y-auto border border-gray-200 rounded-lg p-3 mb-3 bg-gray-50"
+                className="h-72 overflow-y-auto border border-slate-200 rounded-xl p-3 mb-3 bg-white/70"
             >
                 {messages.length === 0 && (
-                    <p className="text-gray-400 text-sm text-center mt-20">
+                    <p className="text-[var(--ink-500)] text-sm text-center mt-20">
                         Start chatting with your AI assistant 👇
                     </p>
                 )}
 
                 {messages.map((msg, index) => (
                     <div key={index} className="mb-3">
-                        <div className="text-sm text-gray-800 font-medium mb-1">You:</div>
-                        <div className="bg-indigo-100 text-gray-800 p-2 rounded-lg w-fit max-w-[80%] mb-2">
+                        <div className="text-sm text-[var(--ink-700)] font-medium mb-1">You:</div>
+                        <div className="bg-emerald-50 text-[var(--ink-900)] p-2 rounded-lg w-fit max-w-[80%] mb-2 border border-emerald-100">
                             {msg.query}
                         </div>
                         {msg.reply && (
                             <>
-                                <div className="text-sm text-gray-600 font-medium mb-1">AI:</div>
-                                <div className="bg-white border border-gray-200 p-2 rounded-lg w-fit max-w-[80%] shadow-sm">
+                                <div className="text-sm text-[var(--ink-500)] font-medium mb-1">AI:</div>
+                                <div className="bg-white border border-slate-200 p-2 rounded-lg w-fit max-w-[80%] shadow-sm">
                                     {msg.reply}
                                 </div>
                             </>
@@ -120,12 +120,12 @@ export default function AIAssistant() {
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleAsk()}
                     placeholder="Type your question..."
-                    className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm"
+                    className="flex-1 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-[var(--accent)] text-sm bg-white/80"
                 />
                 <button
                     onClick={handleAsk}
                     disabled={loading}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-1 text-sm disabled:opacity-50"
+                    className="btn-primary px-4 py-2 flex items-center gap-1 text-sm disabled:opacity-50"
                 >
                     <Send size={16} />
                     {loading ? "Thinking..." : "Ask"}

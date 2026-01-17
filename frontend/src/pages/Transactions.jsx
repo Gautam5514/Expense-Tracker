@@ -11,19 +11,19 @@ const ROWS_PER_PAGE = 10;
 
 // Helper to assign colors to categories for better visualization
 const categoryColors = {
-  Groceries: "bg-green-100 text-green-600",
-  Dining: "bg-blue-100 text-blue-600",
-  Rent: "bg-orange-100 text-orange-600",
-  Transportation: "bg-indigo-100 text-indigo-600",
-  Shopping: "bg-pink-100 text-pink-600",
-  Income: "bg-emerald-100 text-emerald-600",
-  Utilities: "bg-cyan-100 text-cyan-600",
+  Groceries: "bg-emerald-100 text-emerald-700",
+  Dining: "bg-amber-100 text-amber-700",
+  Rent: "bg-slate-100 text-slate-700",
+  Transportation: "bg-sky-100 text-sky-700",
+  Shopping: "bg-rose-100 text-rose-700",
+  Income: "bg-teal-100 text-teal-700",
+  Utilities: "bg-cyan-100 text-cyan-700",
   default: "bg-gray-100 text-gray-600",
 };
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-64">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--accent)]"></div>
   </div>
 );
 
@@ -160,7 +160,7 @@ export default function Transactions() {
       text: `You are about to delete ${idsToDelete.length} transaction(s). This action cannot be undone.`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#4F46E5', // Indigo
+      confirmButtonColor: '#1F8A82', // Accent teal
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!'
     }).then(async (result) => {
@@ -225,58 +225,61 @@ export default function Transactions() {
   if (error) return <div className="text-center p-8 text-red-500">{error}</div>;
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Transactions</h1>
+      <div className="flex justify-between items-center mb-2 flex-wrap gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold font-display">Transactions</h1>
+          <p className="text-sm text-[var(--ink-500)]">Every detail, elegantly organized.</p>
+        </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-              <button onClick={handlePreviousMonth} className="p-2 rounded-md hover:bg-gray-100">
+              <button onClick={handlePreviousMonth} className="btn-ghost px-3 py-2">
                   <ChevronLeft size={20} />
               </button>
-              <span className="font-semibold text-lg w-36 text-center">
+              <span className="font-semibold text-lg w-36 text-center text-[var(--ink-700)]">
                   {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
               </span>
-              <button onClick={handleNextMonth} className="p-2 rounded-md hover:bg-gray-100">
+              <button onClick={handleNextMonth} className="btn-ghost px-3 py-2">
                   <ChevronRight size={20} />
               </button>
           </div>
-          <button onClick={handleOpenNewModal} className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700">
+          <button onClick={handleOpenNewModal} className="btn-primary text-sm">
             + New Transaction
           </button>
         </div>
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center justify-between bg-white p-4 shadow rounded-lg mb-6 flex-wrap gap-4">
+      <div className="flex items-center justify-between app-card p-4 mb-6 flex-wrap gap-4">
         <div className="flex items-center space-x-2 flex-1 min-w-[250px]">
-          <Search size={18} className="text-gray-500" />
+          <Search size={18} className="text-[var(--ink-500)]" />
           <input
             type="text"
             placeholder="Search by description, category..."
-            className="w-full outline-none text-sm"
+            className="w-full outline-none text-sm bg-transparent text-[var(--ink-700)]"
             value={searchTerm}
             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
           />
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center px-3 py-2 text-sm border rounded-md hover:bg-gray-50"><Filter size={16} className="mr-1" /> Filters</button>
-          <button onClick={handleExportCSV} className="flex items-center px-3 py-2 text-sm border rounded-md hover:bg-gray-50"><Download size={16} className="mr-1" /> Export</button>
+          <button className="flex items-center px-3 py-2 text-sm border border-slate-200 rounded-full hover:bg-white"><Filter size={16} className="mr-1" /> Filters</button>
+          <button onClick={handleExportCSV} className="flex items-center px-3 py-2 text-sm border border-slate-200 rounded-full hover:bg-white"><Download size={16} className="mr-1" /> Export</button>
           {selectedRows.length > 0 && (
             <>
-              <div className="h-6 border-l mx-2"></div>
-              <div className="text-sm text-gray-500">{selectedRows.length} selected</div>
-              <button onClick={() => handleDelete(selectedRows)} className="px-3 py-2 text-sm border rounded-md text-red-600 hover:bg-red-50">Delete</button>
+              <div className="h-6 border-l mx-2 border-slate-200"></div>
+              <div className="text-sm text-[var(--ink-500)]">{selectedRows.length} selected</div>
+              <button onClick={() => handleDelete(selectedRows)} className="px-3 py-2 text-sm border border-red-200 rounded-full text-red-600 hover:bg-red-50">Delete</button>
             </>
           )}
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white shadow rounded-lg overflow-x-auto">
+      <div className="app-card overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr className="text-left text-gray-600">
+          <thead className="bg-slate-50 border-b border-slate-100">
+            <tr className="text-left text-[var(--ink-500)]">
               <th className="p-3"><input type="checkbox" onChange={handleSelectAll} checked={paginatedTransactions.length > 0 && selectedRows.length === paginatedTransactions.length} /></th>
               <th className="p-3">Date</th>
               <th className="p-3">Description</th>
@@ -289,23 +292,23 @@ export default function Transactions() {
           </thead>
           <tbody>
             {paginatedTransactions.map((t) => (
-              <tr key={t._id} className={`border-b hover:bg-gray-50 ${selectedRows.includes(t._id) ? "bg-indigo-50" : ""}`}>
+              <tr key={t._id} className={`border-b border-slate-100 hover:bg-slate-50 ${selectedRows.includes(t._id) ? "bg-emerald-50/60" : ""}`}>
                 <td className="p-3"><input type="checkbox" checked={selectedRows.includes(t._id)} onChange={() => handleToggleRow(t._id)} /></td>
                 <td className="p-3 whitespace-nowrap">{new Date(t.date).toLocaleDateString()}</td>
-                <td className="p-3 font-medium text-gray-800 max-w-[250px] truncate" title={t.notes}>{t.notes || t.category}</td>
+                <td className="p-3 font-medium text-[var(--ink-900)] max-w-[250px] truncate" title={t.notes}>{t.notes || t.category}</td>
                 <td className="p-3"><span className={`px-2 py-1 text-xs rounded-full font-medium ${categoryColors[t.category] || categoryColors.default}`}>{t.category}</span></td>
-                <td className="p-3 max-w-[200px] truncate">{t.tags?.join(', ') || 'N/A'}</td>
-                <td className={`p-3 font-semibold text-right ${t.type === 'expense' ? "text-red-500" : "text-green-600"}`}>
+                <td className="p-3 max-w-[200px] truncate text-[var(--ink-500)]">{t.tags?.join(', ') || 'N/A'}</td>
+                <td className={`p-3 font-semibold text-right ${t.type === 'expense' ? "text-red-500" : "text-emerald-600"}`}>
                   {t.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                 </td>
-                <td className="p-3">{t.paymentMethod}</td>
+                <td className="p-3 text-[var(--ink-700)]">{t.paymentMethod}</td>
                 <td className="p-3 text-center">
                   <div className="relative" ref={activeMenu === t._id ? menuRef : null}>
-                    <button onClick={() => handleToggleMenu(t._id)} className="text-gray-400 hover:text-gray-700 p-1 rounded-full"><MoreHorizontal size={18} /></button>
+                    <button onClick={() => handleToggleMenu(t._id)} className="text-[var(--ink-500)] hover:text-[var(--ink-900)] p-1 rounded-full"><MoreHorizontal size={18} /></button>
                     {activeMenu === t._id && (
-                      <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-20 border">
-                        <a onClick={() => handleOpenViewModal(t)} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"><Eye size={14} className="mr-2" /> View</a>
-                        <a onClick={() => handleOpenEditModal(t)} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"><Edit size={14} className="mr-2" /> Edit</a>
+                      <div className="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg z-20 border border-slate-100">
+                        <a onClick={() => handleOpenViewModal(t)} className="flex items-center px-4 py-2 text-sm text-[var(--ink-700)] hover:bg-slate-50 cursor-pointer"><Eye size={14} className="mr-2" /> View</a>
+                        <a onClick={() => handleOpenEditModal(t)} className="flex items-center px-4 py-2 text-sm text-[var(--ink-700)] hover:bg-slate-50 cursor-pointer"><Edit size={14} className="mr-2" /> Edit</a>
                         <a onClick={() => handleDelete([t._id])} className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 cursor-pointer"><Trash2 size={14} className="mr-2" /> Delete</a>
                       </div>
                     )}
@@ -318,11 +321,11 @@ export default function Transactions() {
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
+      <div className="flex justify-between items-center mt-4 text-sm text-[var(--ink-500)]">
         <p>Showing {Math.min(filteredTransactions.length, (currentPage - 1) * ROWS_PER_PAGE + 1)} to {Math.min(filteredTransactions.length, currentPage * ROWS_PER_PAGE)} of {filteredTransactions.length} transactions</p>
         <div className="flex space-x-2">
-          <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 border rounded-md hover:bg-gray-50 disabled:opacity-50">Previous</button>
-          <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 border rounded-md hover:bg-gray-50 disabled:opacity-50">Next</button>
+          <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 border border-slate-200 rounded-full hover:bg-white disabled:opacity-50">Previous</button>
+          <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 border border-slate-200 rounded-full hover:bg-white disabled:opacity-50">Next</button>
         </div>
       </div>
       

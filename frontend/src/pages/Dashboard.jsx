@@ -12,7 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 // --- Helper Components ---
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-64">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--accent)]"></div>
   </div>
 );
 
@@ -23,10 +23,10 @@ const ErrorDisplay = ({ message }) => (
   </div>
 );
   
-const StatCard = ({ title, value, children, bgColor = 'bg-white' }) => (
-  <div className={`${bgColor} shadow-sm rounded-lg p-5`}>
-    <p className="text-slate-900  text-sm font-medium">{title}</p>
-    <h2 className="text-2xl font-bold text-gray-800 mt-1">{value}</h2>
+const StatCard = ({ title, value, children, className = "" }) => (
+  <div className={`app-card p-5 ${className}`}>
+    <p className="text-[var(--ink-500)] text-sm font-medium uppercase tracking-wide">{title}</p>
+    <h2 className="text-2xl font-semibold text-[var(--ink-900)] mt-1">{value}</h2>
     {children}
   </div>
 );
@@ -74,7 +74,7 @@ export default function Dashboard() {
   const handlePreviousMonth = () => setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   const handleNextMonth = () => setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
 
-  const COLORS = ["#4F46E5", "#F59E0B", "#10B981", "#EF4444", "#6B7280"];
+  const COLORS = ["#1F8A82", "#C9A26A", "#4B9FD8", "#E07A5F", "#5B6078"];
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorDisplay message={error} />;
@@ -92,23 +92,26 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         {/* Left Section: Title + Month Nav */}
         <div className="flex items-center gap-6">
-          <h1 className="text-2xl font-bold whitespace-nowrap">Dashboard</h1>
+          <div>
+            <h1 className="text-3xl font-semibold font-display whitespace-nowrap">Dashboard</h1>
+            <p className="text-sm text-[var(--ink-500)]">Your premium snapshot for the month.</p>
+          </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handlePreviousMonth}
-              className="p-1 rounded-md hover:bg-indigo-600"
+              className="btn-ghost px-3 py-2"
             >
               <ChevronLeft size={20} />
             </button>
-            <span className="font-semibold text-slate-900  text-lg w-36 text-center">
+            <span className="font-semibold text-[var(--ink-700)] text-lg w-36 text-center">
               {currentDate.toLocaleString("default", { month: "long", year: "numeric" })}
             </span>
             <button
               onClick={handleNextMonth}
-              className="p-1 rounded-md hover:bg-indigo-600"
+              className="btn-ghost px-3 py-2"
             >
               <ChevronRight size={20} />
             </button>
@@ -118,7 +121,7 @@ export default function Dashboard() {
         {/* Right Section: Add Expense Button */}
         <button
           onClick={handleOpenModal}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-900  bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700"
+          className="btn-primary flex items-center gap-2 text-sm"
         >
           <Plus size={16} /> Add Expense
         </button>
@@ -132,7 +135,7 @@ export default function Dashboard() {
           <StatCard
             title="Monthly Income"
             value={summary.totalIncome.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-            bgColor="bg-emerald-50"
+            className="bg-emerald-50/70 border-emerald-100"
           />
         )}
 
@@ -146,7 +149,7 @@ export default function Dashboard() {
           <StatCard
             title={isOverspent ? 'Overspent' : 'Remaining'}
             value={Math.abs(summary.remainingBalance).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
-            bgColor={isOverspent ? 'bg-red-50' : 'bg-white'}
+            className={isOverspent ? 'bg-red-50/70 border-red-100' : ''}
           />
         )}
 
@@ -158,8 +161,8 @@ export default function Dashboard() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 bg-slate-100 shadow-sm rounded-lg p-4">
-          <h3 className="text-slate-900  font-medium mb-4">Daily Spending</h3>
+        <div className="lg:col-span-3 app-card p-4">
+          <h3 className="text-[var(--ink-700)] font-medium mb-4">Daily Spending</h3>
           <ResponsiveContainer width="100%" height={300}>
             {/* Using spendingOverTime data from the report */}
             <LineChart data={spendingOverTime}>
@@ -168,13 +171,13 @@ export default function Dashboard() {
               <Tooltip formatter={(value) => value.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })} />
               <Legend />
               {/* The data key is 'spending' from your backend */}
-              <Line type="monotone" dataKey="spending" name="Spending" stroke="#4F46E5" strokeWidth={2} />
+              <Line type="monotone" dataKey="spending" name="Spending" stroke="#1F8A82" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="lg:col-span-2 bg-white shadow-sm rounded-lg p-4">
-          <h3 className="text-slate-900  font-medium mb-4">Category Breakdown</h3>
+        <div className="lg:col-span-2 app-card p-4">
+          <h3 className="text-[var(--ink-700)] font-medium mb-4">Category Breakdown</h3>
           <ResponsiveContainer width="100%" height={300}>
             {/* Using spendingByCategory data from the report */}
             <PieChart>

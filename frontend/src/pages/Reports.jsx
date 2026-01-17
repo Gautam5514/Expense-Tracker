@@ -8,11 +8,11 @@ import {
 import "jspdf-autotable";
 
 
-const COLORS = ["#6366F1", "#10B981", "#F59E0B", "#3B82F6", "#EF4444", "#8B5CF6"];
+const COLORS = ["#1F8A82", "#C9A26A", "#4B9FD8", "#E07A5F", "#5B6078", "#7BB0A8"];
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-64">
-    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div>
+    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--accent)]"></div>
   </div>
 );
 
@@ -136,47 +136,47 @@ const handleExportPDF = async () => {
   return (
       <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Reports</h1>
-        <p className="text-gray-500">Analyze your spending patterns with detailed reports.</p>
+        <h1 className="text-3xl font-semibold font-display">Reports</h1>
+        <p className="text-[var(--ink-500)]">Elegant breakdowns for smarter decisions.</p>
       </div>
 
-      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
-        <p className="font-semibold text-gray-700">Monthly Summary</p>
-        <select value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+      <div className="flex justify-between items-center app-card p-4">
+        <p className="font-semibold text-[var(--ink-700)]">Monthly Summary</p>
+        <select value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="border border-slate-200 rounded-full px-4 py-2 text-sm bg-white/80 focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)]">
           {dateOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
         </select>
       </div>
       
       {!hasData ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-          <h3 className="text-lg font-medium text-gray-800">No transactions found for this period.</h3>
-          <p className="text-gray-500 mt-1">Try selecting another month or adding some transactions.</p>
+        <div className="text-center py-12 app-card">
+          <h3 className="text-lg font-medium text-[var(--ink-900)]">No transactions found for this period.</h3>
+          <p className="text-[var(--ink-500)] mt-1">Try selecting another month or adding some transactions.</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white shadow-sm rounded-lg p-4">
-              <p className="text-gray-500 text-sm">Total Spending</p>
+            <div className="app-card p-4">
+              <p className="text-[var(--ink-500)] text-sm uppercase tracking-wide">Total Spending</p>
               {/* Now this line is safe because `summary` will always be an object */}
-              <h2 className="text-xl font-semibold">{summary.totalSpending.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</h2>
+              <h2 className="text-xl font-semibold text-[var(--ink-900)]">{summary.totalSpending.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</h2>
             </div>
-            <div className="bg-white shadow-sm rounded-lg p-4">
-              <p className="text-gray-500 text-sm">Income</p>
-              <h2 className="text-xl font-semibold">{summary.totalIncome.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</h2>
+            <div className="app-card p-4">
+              <p className="text-[var(--ink-500)] text-sm uppercase tracking-wide">Income</p>
+              <h2 className="text-xl font-semibold text-[var(--ink-900)]">{summary.totalIncome.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</h2>
             </div>
-            <div className={`bg-white shadow-sm rounded-lg p-4 ${summary.remainingBalance < 0 ? 'bg-red-50' : ''}`}>
-              <p className="text-gray-500 text-sm">{summary.remainingBalance < 0 ? 'Overspent' : 'Remaining'}</p>
-              <h2 className={`text-xl font-semibold ${summary.remainingBalance < 0 ? 'text-red-600' : ''}`}>
+            <div className={`app-card p-4 ${summary.remainingBalance < 0 ? 'bg-red-50/70 border-red-100' : ''}`}>
+              <p className="text-[var(--ink-500)] text-sm uppercase tracking-wide">{summary.remainingBalance < 0 ? 'Overspent' : 'Remaining'}</p>
+              <h2 className={`text-xl font-semibold ${summary.remainingBalance < 0 ? 'text-red-600' : 'text-[var(--ink-900)]'}`}>
                 {summary.remainingBalance.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
               </h2>
             </div>
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold mb-4">Spending Breakdown</h2>
+            <h2 className="text-lg font-semibold mb-4 text-[var(--ink-900)]">Spending Breakdown</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white shadow-sm rounded-lg p-4">
-                <h3 className="text-gray-600 font-medium mb-4">By Category</h3>
+              <div className="app-card p-4">
+                <h3 className="text-[var(--ink-700)] font-medium mb-4">By Category</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     {/* `spendingByCategory` will always be an array */}
@@ -187,8 +187,8 @@ const handleExportPDF = async () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="bg-white shadow-sm rounded-lg p-4">
-                <h3 className="text-gray-600 font-medium mb-4">Spending Over Time</h3>
+              <div className="app-card p-4">
+                <h3 className="text-[var(--ink-700)] font-medium mb-4">Spending Over Time</h3>
                 <ResponsiveContainer width="100%" height={250}>
                   {/* `spendingOverTime` will always be an array */}
                   <LineChart data={spendingOverTime}>
@@ -196,19 +196,19 @@ const handleExportPDF = async () => {
                     <YAxis stroke="#9CA3AF" tickFormatter={(value) => `₹${value}`}/>
                     <Tooltip formatter={(value) => value.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}/>
                     <Legend />
-                    <Line type="monotone" dataKey="spending" stroke="#6366F1" strokeWidth={2} />
+                    <Line type="monotone" dataKey="spending" stroke="#1F8A82" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
           </div>
 
-          <div className="bg-white shadow-sm rounded-lg p-4">
-            <h3 className="text-gray-700 font-medium mb-2">Export Report</h3>
-            <p className="text-gray-500 text-sm mb-4">Download your monthly summary report in your preferred format.</p>
+          <div className="app-card p-4">
+            <h3 className="text-[var(--ink-700)] font-medium mb-2">Export Report</h3>
+            <p className="text-[var(--ink-500)] text-sm mb-4">Download your monthly summary report in your preferred format.</p>
             <div className="flex space-x-3">
-              <button onClick={handleExportPDF} className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Export to PDF</button>
-              <button onClick={handleExportCSV} className="px-4 py-2 border rounded-md hover:bg-gray-50">Export to CSV</button>
+              <button onClick={handleExportPDF} className="btn-primary text-sm">Export to PDF</button>
+              <button onClick={handleExportCSV} className="btn-secondary text-sm">Export to CSV</button>
             </div>
           </div>
         </>

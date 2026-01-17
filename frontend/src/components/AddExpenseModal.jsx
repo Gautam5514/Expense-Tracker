@@ -21,14 +21,14 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 // Enhanced InputField with Icon support
 const InputField = ({ icon, label, ...props }) => (
     <div>
-        <label htmlFor={props.name} className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+        <label htmlFor={props.name} className="block text-sm font-medium text-[var(--ink-700)] mb-1.5">{label}</label>
         <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                 {icon}
             </div>
             <input
                 {...props}
-                className="w-full rounded-lg border-gray-300 py-2.5 pl-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className="w-full rounded-xl border border-slate-200 py-2.5 pl-10 text-sm shadow-sm focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]"
             />
         </div>
     </div>
@@ -210,14 +210,14 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
 
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
             {/* Modal Panel with scrollable structure */}
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[95vh]">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[95vh] border border-white/70">
                 {/* Sticky Header */}
-                <div className="p-5 border-b bg-slate-50 rounded-t-xl sticky top-0">
+                <div className="p-5 border-b border-slate-100 bg-slate-50 rounded-t-2xl sticky top-0">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit Expense' : 'Add New Expense'}</h2>
-                        <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={24} /></button>
+                        <h2 className="text-xl font-semibold text-[var(--ink-900)]">{isEditMode ? 'Edit Expense' : 'Add New Expense'}</h2>
+                        <button onClick={onClose} className="text-[var(--ink-500)] hover:text-[var(--ink-900)]"><X size={22} /></button>
                     </div>
                 </div>
 
@@ -226,27 +226,27 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
                     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         {/* --- Left Column --- */}
                         <div className="space-y-6">
-                            <InputField icon={<Wallet size={18} className="text-gray-400" />} label="Amount" name="amount" value={formData.amount} onChange={handleChange} placeholder="0.00" type="number" required />
-                            <InputField icon={<CalendarIcon size={18} className="text-gray-400" />} label="Date" name="date" value={formData.date} onChange={handleChange} type="date" required />
+                            <InputField icon={<Wallet size={18} className="text-[var(--ink-500)]" />} label="Amount" name="amount" value={formData.amount} onChange={handleChange} placeholder="0.00" type="number" required />
+                            <InputField icon={<CalendarIcon size={18} className="text-[var(--ink-500)]" />} label="Date" name="date" value={formData.date} onChange={handleChange} type="date" required />
                             <div>
-                                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+                                <label htmlFor="category" className="block text-sm font-medium text-[var(--ink-700)] mb-1.5">Category</label>
                                 <div className="relative">
                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <LayoutGrid size={18} className="text-gray-400" />
+                                        <LayoutGrid size={18} className="text-[var(--ink-500)]" />
                                     </div>
-                                    <input list="category-suggestions" id="category" name="category" value={formData.category} onChange={handleChange} placeholder="Select or type a category" className="w-full rounded-lg border-gray-300 py-2.5 pl-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autoComplete="off" required />
+                                    <input list="category-suggestions" id="category" name="category" value={formData.category} onChange={handleChange} placeholder="Select or type a category" className="w-full rounded-xl border border-slate-200 py-2.5 pl-10 text-sm shadow-sm focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]" autoComplete="off" required />
                                     <datalist id="category-suggestions">
                                         {availableCategories.map((cat, index) => <option key={index} value={cat} />)}
                                     </datalist>
                                 </div>
                             </div>
                             <div>
-                                <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-1.5">Payment Method</label>
+                                <label htmlFor="paymentMethod" className="block text-sm font-medium text-[var(--ink-700)] mb-1.5">Payment Method</label>
                                 <div className="relative">
                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <CreditCard size={18} className="text-gray-400" />
+                                        <CreditCard size={18} className="text-[var(--ink-500)]" />
                                     </div>
-                                    <select id="paymentMethod" name="paymentMethod" value={formData.paymentMethod} onChange={handleChange} className="w-full rounded-lg border-gray-300 py-2.5 pl-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <select id="paymentMethod" name="paymentMethod" value={formData.paymentMethod} onChange={handleChange} className="w-full rounded-xl border border-slate-200 py-2.5 pl-10 text-sm shadow-sm focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]">
                                         <option>Credit Card</option> <option>Debit Card</option> <option>Cash</option> <option>Bank Transfer</option>
                                     </select>
                                 </div>
@@ -255,18 +255,18 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
 
                         {/* --- Right Column --- */}
                         <div className="space-y-6">
-                            <InputField icon={<Building size={18} className="text-gray-400" />} label="Merchant" name="merchant" value={formData.merchant} onChange={handleChange} onBlur={handleGetSuggestions} placeholder="e.g., Amazon, Starbucks" />
-                            <InputField icon={<TagsIcon size={18} className="text-gray-400" />} label="Tags (comma-separated)" name="tags" value={formData.tags} onChange={handleChange} placeholder="e.g., work, personal, food" />
+                            <InputField icon={<Building size={18} className="text-[var(--ink-500)]" />} label="Merchant" name="merchant" value={formData.merchant} onChange={handleChange} onBlur={handleGetSuggestions} placeholder="e.g., Amazon, Starbucks" />
+                            <InputField icon={<TagsIcon size={18} className="text-[var(--ink-500)]" />} label="Tags (comma-separated)" name="tags" value={formData.tags} onChange={handleChange} placeholder="e.g., work, personal, food" />
 
                             {/* ✅ NEW: AI Suggestions Area */}
                             {(isSuggesting || suggestions.tags.length > 0) && (
-                                <div className="p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-                                    <div className="flex items-center gap-2 mb-2 text-sm font-medium text-indigo-800">
+                                <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl">
+                                    <div className="flex items-center gap-2 mb-2 text-sm font-medium text-emerald-800">
                                         <Lightbulb size={16} />
                                         <span>AI Suggestions</span>
                                     </div>
                                     {isSuggesting ? (
-                                        <p className="text-xs text-indigo-700">Generating ideas...</p>
+                                        <p className="text-xs text-emerald-700">Generating ideas...</p>
                                     ) : (
                                         <div className="flex flex-wrap gap-2">
                                             {suggestions.tags.map(tag => (
@@ -274,7 +274,7 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
                                                     key={tag}
                                                     type="button"
                                                     onClick={() => handleAddTag(tag)}
-                                                    className="px-2.5 py-1 text-xs font-semibold text-indigo-700 bg-white border border-indigo-300 rounded-full hover:bg-indigo-100 transition-colors"
+                                                    className="px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-white border border-emerald-300 rounded-full hover:bg-emerald-100 transition-colors"
                                                 >
                                                     + {tag}
                                                 </button>
@@ -285,31 +285,31 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
                             )}
 
                             <div>
-                                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
-                                <textarea id="notes" name="notes" rows="4" value={formData.notes} onChange={handleChange} onBlur={handleGetSuggestions} placeholder="Add any details..." className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                                <label htmlFor="notes" className="block text-sm font-medium text-[var(--ink-700)] mb-1.5">Notes</label>
+                                <textarea id="notes" name="notes" rows="4" value={formData.notes} onChange={handleChange} onBlur={handleGetSuggestions} placeholder="Add any details..." className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm shadow-sm focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)]"></textarea>
                             </div>
                         </div>
 
                         {/* --- Attachment Section (spanning both columns) --- */}
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Attachment</label>
+                            <label className="block text-sm font-medium text-[var(--ink-700)] mb-1.5">Attachment</label>
                             {attachment ? (
-                                <div className="mt-1 flex items-center justify-between p-3 border-2 border-gray-300 rounded-lg bg-slate-50">
+                                <div className="mt-1 flex items-center justify-between p-3 border-2 border-slate-200 rounded-xl bg-slate-50">
                                     <div className="flex items-center gap-3">
-                                        <Paperclip className="h-5 w-5 text-gray-500" />
+                                        <Paperclip className="h-5 w-5 text-[var(--ink-500)]" />
                                         <div className="text-sm">
-                                            <p className="font-medium text-gray-800 truncate max-w-xs">{attachment.name}</p>
-                                            <p className="text-gray-500">{formatFileSize(attachment.size)}</p>
+                                            <p className="font-medium text-[var(--ink-900)] truncate max-w-xs">{attachment.name}</p>
+                                            <p className="text-[var(--ink-500)]">{formatFileSize(attachment.size)}</p>
                                         </div>
                                     </div>
                                     <button type="button" onClick={handleRemoveAttachment} className="text-red-500 hover:text-red-700"><X size={20} /></button>
                                 </div>
                             ) : (
-                                <div onClick={() => fileInputRef.current.click()} className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-indigo-500 transition-colors">
+                                <div onClick={() => fileInputRef.current.click()} className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer hover:border-[var(--accent)] transition-colors">
                                     <div className="space-y-1 text-center">
-                                        <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-                                        <p className="text-sm text-gray-600"><span className="font-semibold text-indigo-600">Click to upload</span> or drag and drop</p>
-                                        <p className="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
+                                        <UploadCloud className="mx-auto h-12 w-12 text-[var(--ink-500)]" />
+                                        <p className="text-sm text-[var(--ink-700)]"><span className="font-semibold text-[var(--accent)]">Click to upload</span> or drag and drop</p>
+                                        <p className="text-xs text-[var(--ink-500)]">PNG, JPG, PDF up to 10MB</p>
                                     </div>
                                 </div>
                             )}
@@ -319,14 +319,14 @@ export default function AddExpenseModal({ isOpen, onClose, transactionToEdit, av
                 </form>
 
                 {/* Sticky Footer */}
-                <div className="bg-slate-50 p-4 flex justify-end space-x-3 rounded-b-xl sticky bottom-0 border-t">
-                    <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium border rounded-lg hover:bg-gray-100">Cancel</button>
+                <div className="bg-slate-50 p-4 flex justify-end space-x-3 rounded-b-2xl sticky bottom-0 border-t border-slate-100">
+                    <button type="button" onClick={onClose} className="btn-secondary text-sm">Cancel</button>
                     {!isEditMode && (
-                        <button type="button" onClick={(e) => handleSubmit(e, false)} disabled={loading} className="px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-100 border border-transparent rounded-lg hover:bg-indigo-200 disabled:opacity-50">
+                        <button type="button" onClick={(e) => handleSubmit(e, false)} disabled={loading} className="px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-100 border border-transparent rounded-full hover:bg-emerald-200 disabled:opacity-50">
                             {loading ? 'Saving...' : 'Save & Add Another'}
                         </button>
                     )}
-                    <button type="button" onClick={(e) => handleSubmit(e, true)} disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 disabled:opacity-50">
+                    <button type="button" onClick={(e) => handleSubmit(e, true)} disabled={loading} className="btn-primary text-sm disabled:opacity-50">
                         {loading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Save Expense')}
                     </button>
                 </div>

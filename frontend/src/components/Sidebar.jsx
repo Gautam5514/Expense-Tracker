@@ -30,12 +30,10 @@ export default function Sidebar() {
       {/* Mobile toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-3
-             rounded-full shadow-xl
-             bg-white/50 border border-white/60
-             backdrop-blur-md backdrop-saturate-150
-             text-white transition-all duration-300
-             hover:bg-white/30 hover:scale-105 active:scale-95"
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-full shadow-xl
+             bg-white/80 border border-white/60 text-[var(--ink-900)]
+             backdrop-blur-md backdrop-saturate-150 transition-all duration-300
+             hover:bg-white hover:scale-105 active:scale-95"
       >
         {isOpen ? <X size={16} /> : <Menu size={16} />}
       </button>
@@ -45,42 +43,48 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-    z-40 top-0 left-0 h-screen bg-slate-800 text-white
+    z-40 top-0 left-0 h-screen text-white
     transition-all duration-300 flex flex-col
-    ${isOpen ? "w-56" : "w-0 lg:w-16"} 
-    ${isOpen ? "fixed lg:sticky" : "hidden lg:flex"} 
+    bg-gradient-to-b from-[#0b1b2b] via-[#122638] to-[#132d40]
+    ${isOpen ? "w-60" : "w-0 lg:w-16"}
+    ${isOpen ? "fixed lg:sticky" : "hidden lg:flex"}
   `}
       >
 
         {/* Logo + collapse toggle */}
-        <div className="flex items-center justify-between p-4 border-b border-purple-500">
+        <div className="flex items-center justify-between p-4 border-b border-white/10">
           <div className="flex items-center space-x-2">
             <img
               src="/logo.png"
               alt="TrackMoney Logo"
               className="w-8 h-8 object-contain"
             />
-            {isOpen && <span className="text-xl font-bold">TrackMoney</span>}
+            {isOpen && (
+              <div className="leading-tight">
+                <span className="text-xl font-semibold font-display">TrackMoney</span>
+                <span className="block text-xs text-white/60">Premium Workspace</span>
+              </div>
+            )}
           </div>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="hidden lg:block text-gray-200 hover:text-white cursor-pointer"
+            className="hidden lg:block text-white/70 hover:text-white cursor-pointer"
           >
             {isOpen ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} />}
           </button>
         </div>
 
         {/* Nav links */}
-        <nav className="flex-1 flex flex-col mt-6 space-y-1">
+        <nav className="flex-1 flex flex-col mt-6 space-y-1 px-3">
           {links.map(({ name, path, icon: Icon }) => (
             <NavLink
               key={path}
               to={path}
               className={({ isActive }) =>
-                `flex items-center px-4 py-3 rounded-md transition-all relative group
+                `flex items-center px-4 py-3 rounded-xl transition-all relative group
                 ${isActive
-                  ? "bg-white text-purple-700 font-semibold shadow-md"
-                  : "text-gray-200 hover:bg-gray-700"
+                  ? "bg-[var(--accent-2)] text-[#0b1b2b] font-semibold shadow-md"
+                  : "text-white/80 hover:bg-white/10"
                 }`
               }
             >
@@ -89,7 +93,7 @@ export default function Sidebar() {
 
               {/* Tooltip when collapsed */}
               {!isOpen && (
-                <span className="absolute left-14 bg-gray-900 text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition">
+                <span className="absolute left-14 bg-[#0b1b2b] text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap transition">
                   {name}
                 </span>
               )}
@@ -98,8 +102,8 @@ export default function Sidebar() {
         </nav>
 
         {/* Footer (optional) */}
-        <div className="p-4 border-t border-purple-500 text-sm text-gray-200">
-          {isOpen && "© 2025 TrackMoney"}
+        <div className="p-4 border-t border-white/10 text-sm text-white/60">
+          {isOpen && "© 2025 TrackMoney. Crafted for clarity."}
         </div>
       </aside>
     </>
